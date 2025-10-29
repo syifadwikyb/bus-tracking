@@ -1,92 +1,191 @@
-// src/components/dashboard/MapView.tsx
 "use client";
 
-import { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import dynamic from "next/dynamic";
+import polyline from "@mapbox/polyline";
+import "leaflet/dist/leaflet.css";
+import { useMap } from "react-leaflet";
+import type { Bus } from "../DashboardClient"; // tipe Bus
 
-export default function MapView() {
-    const [selectedRoute, setSelectedRoute] = useState("Route A");
-    const routes = ["Route A", "Route B", "Route C", "Route D"];
+// Dynamic import komponen Leaflet
+const MapContainer = dynamic(() => import("react-leaflet").then(mod => mod.MapContainer), { ssr: false });
+const TileLayer = dynamic(() => import("react-leaflet").then(mod => mod.TileLayer), { ssr: false });
+const Marker = dynamic(() => import("react-leaflet").then(mod => mod.Marker), { ssr: false });
+const Popup = dynamic(() => import("react-leaflet").then(mod => mod.Popup), { ssr: false });
+const Polyline = dynamic(() => import("react-leaflet").then(mod => mod.Polyline), { ssr: false });
 
+interface MapViewProps {
+  buses: Bus[];
+  selectedRoute: any;
+  onBusClick: (bus: Bus | null) => void;
+}
+
+// Komponen bantu untuk memperbarui posisi peta
+function MapUpdater({ center }: { center: [number, number] | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (center) map.panTo(center, { animate: true });
+  }, [center, map]);
+  return null;
+}
+
+// Fungsi menghitung rotasi arah bus
+const calculateBearing = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const toDeg = (rad: number) => (rad * 180) / Math.PI;
+  const dLon = toRad(lon2 - lon1);
+  const lat1Rad = toRad(lat1);
+  const lat2Rad = toRad(lat2);
+  const y = Math.sin(dLon) * Math.cos(lat2Rad);
+  const x =
+    Math.cos(lat1Rad) * Math.sin(lat2Rad) -
+    Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon);
+  let bearing = toDeg(Math.atan2(y, x));
+  if (bearing < 0) bearing += 360;
+  return bearing;
+};
+
+// --- KOMPONEN UTAMA ---
+export default function MapView({ buses, selectedRoute, onBusClick }: MapViewProps) {
+  const [L, setL] = useState<any>(null);
+  const [halteIcon, setHalteIcon] = useState<any>(null);
+  const [busIcon, setBusIcon] = useState<any>(null);
+  const [decodedPolyline, setDecodedPolyline] = useState<[number, number][] | null>(null);
+
+  const lastPositions = useRef<Map<number, { lat: number, lon: number }>>(new Map());
+  const rotations = useRef<Map<number, number>>(new Map());
+
+  // Import leaflet dan set ikon
+  useEffect(() => {
+    import("leaflet").then((leaflet) => {
+      setL(leaflet);
+      // Ikon halte
+      setHalteIcon(
+        leaflet.icon({
+          iconUrl: "/assets/icons/Bus-Stop.svg",
+          iconSize: [35, 35],
+          iconAnchor: [17, 35],
+        })
+      );
+
+      // Ikon bus
+      setBusIcon(
+        leaflet.icon({
+          iconUrl: "/assets/icons/bus.png",
+          iconSize: [40, 40],
+          iconAnchor: [20, 20],
+        })
+      );
+    });
+  }, []);
+
+  // Decode polyline jika rute dipilih
+  useEffect(() => {
+    if (selectedRoute && selectedRoute.rute_polyline) {
+      try {
+        const decoded = polyline.decode(selectedRoute.rute_polyline);
+        setDecodedPolyline(decoded as [number, number][]);
+      } catch (e) {
+        console.error("Gagal decode polyline:", e);
+        setDecodedPolyline(null);
+      }
+    } else {
+      setDecodedPolyline(null);
+    }
+  }, [selectedRoute]);
+
+  // Hitung rotasi bus
+  useEffect(() => {
+    buses.forEach(bus => {
+      if (bus.latitude && bus.longitude) {
+        const lastPos = lastPositions.current.get(bus.id_bus);
+        if (lastPos && (lastPos.lat !== bus.latitude || lastPos.lon !== bus.longitude)) {
+          const newRotation = calculateBearing(
+            lastPos.lat,
+            lastPos.lon,
+            bus.latitude,
+            bus.longitude
+          );
+          rotations.current.set(bus.id_bus, newRotation);
+        } else if (!lastPos) {
+          rotations.current.set(bus.id_bus, 0);
+        }
+        lastPositions.current.set(bus.id_bus, { lat: bus.latitude, lon: bus.longitude });
+      }
+    });
+  }, [buses]);
+
+  if (!L || !halteIcon || !busIcon) {
     return (
-        <div className="bg-white rounded-3xl shadow-lg p-6 h-full">
-            {/* Header with Route Selector */}
-            <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                        <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                        </svg>
-                    </div>
-                    <select
-                        value={selectedRoute}
-                        onChange={(e) => setSelectedRoute(e.target.value)}
-                        className="px-4 py-2 bg-primary text-white rounded-xl font-semibold cursor-pointer hover:bg-primary/90 transition-colors outline-none"
-                    >
-                        {routes.map((route) => (
-                            <option key={route} value={route}>
-                                {route}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                <div className="flex items-center gap-2 px-4 py-2 bg-success/10 text-success rounded-xl">
-                    <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
-                    <span className="font-semibold text-sm">Bus A</span>
-                </div>
-            </div>
-
-            {/* Map Container */}
-            <div className="relative bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl overflow-hidden h-96">
-                {/* Mock Map with Grid Pattern */}
-                <div className="absolute inset-0 opacity-10">
-                    <div className="grid grid-cols-8 grid-rows-8 h-full">
-                        {Array.from({ length: 64 }).map((_, i) => (
-                            <div key={i} className="border border-gray-300" />
-                        ))}
-                    </div>
-                </div>
-
-                {/* Map Content - Placeholder for actual map integration */}
-                <div className="relative h-full flex items-center justify-center">
-                    {/* Route Path Visualization */}
-                    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 300">
-                        <path
-                            d="M 50 150 Q 150 50, 250 150 T 350 150"
-                            stroke="#2356CF"
-                            strokeWidth="3"
-                            fill="none"
-                            strokeDasharray="8 4"
-                            className="animate-pulse"
-                        />
-
-                        {/* Bus Position */}
-                        <circle cx="180" cy="100" r="8" fill="#0B7E6E" className="animate-pulse">
-                            <animateTransform
-                                attributeName="transform"
-                                type="translate"
-                                values="0,0; 20,10; 0,0"
-                                dur="3s"
-                                repeatCount="indefinite"
-                            />
-                        </circle>
-                    </svg>
-
-                    {/* Info Card */}
-                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg">
-                        <p className="text-xs text-gray-500 mb-1">Current Location</p>
-                        <p className="font-semibold text-sm text-gray-800">Jl. Rembangan Center</p>
-                        <div className="flex items-center gap-2 mt-2">
-                            <div className="w-6 h-6 bg-success/20 rounded-full flex items-center justify-center">
-                                <svg className="w-3 h-3 text-success" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                            </div>
-                            <span className="text-xs text-success font-medium">On Time</span>
-                        </div>
-                    </div>                    
-                </div>
-            </div>            
-        </div>
+      <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <p>Memuat peta...</p>
+      </div>
     );
+  }
+
+  const activeBuses = buses.filter(b => b.latitude && b.longitude);
+  const mapCenter: [number, number] = activeBuses.length > 0
+    ? [activeBuses[0].latitude!, activeBuses[0].longitude!]
+    : [-6.9175, 107.6191]; // Default Bandung
+
+  return (
+    <div style={{ height: "100%", width: "100%" }}>
+      <MapContainer center={mapCenter} zoom={13} style={{ height: "100%", width: "100%" }}>
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' />
+        {/* Polyline Rute */}
+        {decodedPolyline && <Polyline positions={decodedPolyline} color="blue" />}
+
+        {/* Marker Halte */}
+        {selectedRoute && selectedRoute.halte &&
+          selectedRoute.halte.map((halte: any) => (
+            <Marker
+              key={halte.id_halte}
+              position={[halte.latitude, halte.longitude]}
+              icon={halteIcon}
+            >
+              <Popup>
+                <b>Halte {halte.urutan}</b><br />
+                {halte.nama_halte}
+              </Popup>
+            </Marker>
+          ))}
+
+        {/* Marker Bus */}
+        {buses.map(bus => {
+          if (bus.latitude && bus.longitude) {
+            const rotation = rotations.current.get(bus.id_bus) || 0;
+
+            // Menggunakan divIcon agar bisa rotasi
+            const dynamicBusIcon = L.divIcon({
+              className: "custom-bus-icon",
+              html: `<img src="/assets/icons/bus.png" style="width: 100%; height: 100%; transform: rotate(${rotation}deg);" />`,
+              iconSize: [40, 40],
+              iconAnchor: [20, 20],
+            });
+
+            return (
+              <Marker
+                key={bus.id_bus}
+                position={[bus.latitude, bus.longitude]}
+                icon={dynamicBusIcon}
+                eventHandlers={{
+                  click: () => onBusClick(bus),
+                }}
+              >
+                <Popup>
+                  <b>{bus.kode_bus || bus.plat_nomor}</b> <br />
+                  Supir: {bus.nama || "N/A"} <br />
+                  Penumpang: {bus.penumpang} / {bus.kapasitas}
+                </Popup>
+              </Marker>
+            );
+          }
+          return null;
+        })}
+
+        {/* Pusatkan peta */}
+        <MapUpdater center={mapCenter} />
+      </MapContainer>
+    </div>
+  );
 }

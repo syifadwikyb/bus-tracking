@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Quicksand } from "next/font/google";
 import "./globals.css";
-import Sidebar from "@/components/Sidebar";
 
 const quicksand = Quicksand({ 
   subsets: ["latin"],
@@ -24,7 +23,7 @@ export default function RootLayout({
       <body className={`${quicksand.variable} font-sans antialiased`}>
         <div className="flex min-h-screen bg-primary">
           {/* Sidebar */}
-          <Sidebar />
+          {/* <Sidebar /> */}
           
           {/* Main Content Area */}
           <main className="flex-1 overflow-auto">

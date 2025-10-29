@@ -1,7 +1,17 @@
-import type { NextConfig } from "next";
+// next.config.js
 
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '5000', // Pastikan port-nya benar
+        pathname: '/**', // Izinkan semua path di host tersebut
+      },
+    ],
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
