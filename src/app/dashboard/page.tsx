@@ -8,8 +8,8 @@ import ProfileCard from './components/ProfileCard';
 import { BusFront, CircleOff, Wrench } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import type { Bus, Stats } from './DashboardClient';
+import { API_URL } from '@/lib/config';
 
-// Tipe data mentah dari API /api/dashboard/live-bus
 interface ApiBus {
   id_bus: number;
   kode_bus: string;
@@ -65,17 +65,14 @@ export default function Page() {
   const [selectedRoute, setSelectedRoute] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Ambil data bus dan rute terlebih dahulu
         const [liveBusRes, routesRes, statsRes] = await Promise.all([
           fetch(`${API_URL}/api/dashboard/live-bus`),
           fetch(`${API_URL}/api/jalur`),
-          fetch(`${API_URL}/api/dashboard/stats`), // Kita tetap ambil 'maintenance'
+          fetch(`${API_URL}/api/dashboard/stats`),
         ]);
 
         if (!liveBusRes.ok || !routesRes.ok || !statsRes.ok) {
@@ -84,14 +81,8 @@ export default function Page() {
 
         const liveBusData: ApiBus[] = await liveBusRes.json();
         const routesData = await routesRes.json();
-        const statsData = await statsRes.json(); // Data maintenance
-
+        const statsData = await statsRes.json();
         const mappedBuses = liveBusData.map(convertApiBusToBus);
-
-        // =================================================================
-        // ⚠️ PERBAIKAN 2: Mengatasi Race Condition ⚠️
-        // Hitung statistik 'active' dan 'nonActive' dari data live
-        // =================================================================
         const activeCount = mappedBuses.filter(
           (bus) => bus.status === 'berjalan'
         ).length;
@@ -100,13 +91,11 @@ export default function Page() {
           (bus) => bus.status === 'berhenti'
         ).length;
 
-        // Gabungkan dengan data maintenance dari API
         setStats({
           active: activeCount,
           nonActive: nonActiveCount,
           maintenance: statsData?.maintenance ?? 0,
         });
-        // =================================================================
 
         setBuses(mappedBuses);
         setRoutes(routesData);
@@ -125,7 +114,6 @@ export default function Page() {
     fetchData();
   }, [API_URL]);
 
-  // 2. Setup Socket.IO listeners
   useEffect(() => {
     if (!socket.connected) socket.connect();
 
