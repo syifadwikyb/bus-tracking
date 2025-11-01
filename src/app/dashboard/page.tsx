@@ -4,10 +4,10 @@
 import { useEffect, useState } from 'react';
 import { socket } from '@/lib/socket';
 import StatsCard from './components/StatsCard';
-import ProfileCard from './components/ProfileCard';
 import { BusFront, CircleOff, Wrench } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import type { Bus, Stats } from './DashboardClient';
+import Header from '@/components/Header';
 import { API_URL } from '@/lib/config';
 
 interface ApiBus {
@@ -186,17 +186,10 @@ export default function Page() {
 
   return (
     <div className="p-8">
-      {/* Header */}
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800">Good Morning Admin!</h1>
-          <h2 className="text-4xl font-extrabold text-gray-900">Dashboard</h2>
-        </div>
-        <ProfileCard />
-      </header>
+      <Header/>
 
       {/* Stats Cards (Sekarang akan menampilkan data yang benar) */}
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <StatsCard
           title="Walk"
           count={stats?.active ?? 0}
