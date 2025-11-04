@@ -4,12 +4,14 @@
 import { useEffect, useState } from 'react';
 import { socket } from '@/lib/socket';
 import StatsCard from './components/StatsCard';
-import { BusFront, CircleOff, Wrench } from 'lucide-react';
+import { BusFront, CircleOff, Wrench, CalendarClock } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import type { Bus, Stats } from './DashboardClient';
+// Pastikan tipe Bus dan Stats diimpor dari DashboardClient
+import type { Bus, Stats } from './DashboardClient'; 
 import Header from '@/components/Header';
 import { API_URL } from '@/lib/config';
 
+// Tipe data mentah dari API (sekarang dari .../api/dashboard)
 interface ApiBus {
   id_bus: number;
   kode_bus: string;
@@ -23,16 +25,25 @@ interface ApiBus {
   terakhir_dilihat: string | null;
   foto: string | null;
   jadwal: {
-    status: string; // <-- Pastikan backend mengirim status jadwal
+    status: string;
     driver: { nama: string, foto: string };
     jalur: { nama_jalur: string };
   }[];
 }
 
+// Tipe Stats yang BENAR (sesuai respons backend)
+interface ApiStats {
+  running: number;
+  stopped: number;
+  maintenance: number;
+  scheduled: number;
+}
+
+// Fungsi konversi (sudah benar)
 const convertApiBusToBus = (apiBus: ApiBus): Bus => {
   const jadwalAktif = apiBus.jadwal?.find(
     (j) => j.status?.toLowerCase() === "berjalan"
-  ) || apiBus.jadwal?.[0]; // Fallback ke jadwal pertama
+  ) || apiBus.jadwal?.[0];
 
   return {
     id_bus: apiBus.id_bus,
@@ -44,11 +55,11 @@ const convertApiBusToBus = (apiBus: ApiBus): Bus => {
     penumpang: apiBus.penumpang,
     kapasitas: apiBus.kapasitas,
     plat_nomor: apiBus.plat_nomor,
-    nama: jadwalAktif?.driver?.nama || null, // Nama driver
-    nama_jalur: jadwalAktif?.jalur?.nama_jalur || null, // Nama jalur
+    nama: jadwalAktif?.driver?.nama || null,
+    nama_jalur: jadwalAktif?.jalur?.nama_jalur || null,
     terakhir_dilihat: apiBus.terakhir_dilihat,
-    foto: apiBus.foto, // Foto bus
-    driver_foto: jadwalAktif?.driver?.foto || null // Foto driver
+    foto: apiBus.foto,
+    driver_foto: jadwalAktif?.driver?.foto || null
   };
 };
 
@@ -65,36 +76,36 @@ export default function Page() {
   const [selectedRoute, setSelectedRoute] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // --- INI ADALAH FUNGSI fetchData YANG BENAR ---
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [liveBusRes, routesRes, statsRes] = await Promise.all([
-          fetch(`${API_URL}/api/dashboard/live-bus`),
+        // HANYA PANGGIL ENDPOINT BARU (/) DAN ENDPOINT JALUR
+        const [mainDataRes, routesRes] = await Promise.all([
+          fetch(`${API_URL}/api/dashboard`), // <-- Memanggil endpoint gabungan
           fetch(`${API_URL}/api/jalur`),
-          fetch(`${API_URL}/api/dashboard/stats`),
         ]);
 
-        if (!liveBusRes.ok || !routesRes.ok || !statsRes.ok) {
+        if (!mainDataRes.ok || !routesRes.ok) {
           throw new Error('Gagal mengambil data awal');
         }
 
-        const liveBusData: ApiBus[] = await liveBusRes.json();
+        const mainData = await mainDataRes.json();
         const routesData = await routesRes.json();
-        const statsData = await statsRes.json();
+        
+        // Ambil data dari respons gabungan
+        const liveBusData: ApiBus[] = mainData.liveBuses;
+        const statsData: ApiStats = mainData.stats; 
+        
         const mappedBuses = liveBusData.map(convertApiBusToBus);
-        const activeCount = mappedBuses.filter(
-          (bus) => bus.status === 'berjalan'
-        ).length;
 
-        const nonActiveCount = mappedBuses.filter(
-          (bus) => bus.status === 'berhenti'
-        ).length;
-
+        // Langsung set stats dari backend (sekarang akan ada angkanya)
         setStats({
-          active: activeCount,
-          nonActive: nonActiveCount,
-          maintenance: statsData?.maintenance ?? 0,
+          active: statsData.running ?? 0,
+          scheduled: statsData.scheduled ?? 0,
+          nonActive: statsData.stopped ?? 0,
+          maintenance: statsData.maintenance ?? 0,
         });
 
         setBuses(mappedBuses);
@@ -112,8 +123,10 @@ export default function Page() {
     };
 
     fetchData();
-  }, [API_URL]);
+  }, [API_URL]); 
+  // ----------------------------------------------------
 
+  // --- useEffect Socket.IO (SUDAH BENAR) ---
   useEffect(() => {
     if (!socket.connected) socket.connect();
 
@@ -121,26 +134,25 @@ export default function Page() {
       setBuses(prevBuses =>
         prevBuses.map(bus =>
           bus.id_bus === data.bus_id
-            ? { ...bus, latitude: data.latitude, longitude: data.longitude, status: 'berjalan', terakhir_dilihat: new Date().toISOString() } // <-- Menggunakan 'berjalan'
+            ? { ...bus, latitude: data.latitude, longitude: data.longitude, status: 'berjalan', terakhir_dilihat: new Date().toISOString() }
             : bus
         )
       );
-
       setSelectedBus(prevSelected =>
         prevSelected && prevSelected.id_bus === data.bus_id
-          ? { ...prevSelected, latitude: data.latitude, longitude: data.longitude, status: 'berjalan', terakhir_dilihat: new Date().toISOString() } // <-- Menggunakan 'berjalan'
+          ? { ...prevSelected, latitude: data.latitude, longitude: data.longitude, status: 'berjalan', terakhir_dilihat: new Date().toISOString() }
           : prevSelected
       );
-
-      // Update stats state saat ada update socket
+      
+      // Update stats di frontend saat socket masuk (opsional)
+      // Ini perlu logika lebih canggih, tapi untuk sementara:
       setStats(prevStats => {
-        const activeCount = buses.filter(b => b.status === 'berjalan').length;
-        const nonActiveCount = buses.filter(b => b.status === 'berhenti').length;
-        return {
-          active: activeCount,
-          nonActive: nonActiveCount,
-          maintenance: prevStats?.maintenance ?? 0
-        };
+         if (!prevStats) return null;
+         return {
+            ...prevStats,
+            active: (prevStats.active || 0) + 1,
+            nonActive: Math.max(0, (prevStats.nonActive || 0) - 1),
+         }
       });
     };
 
@@ -150,7 +162,6 @@ export default function Page() {
           bus.id_bus === data.bus_id ? { ...bus, penumpang: data.passenger_count } : bus
         )
       );
-
       setSelectedBus(prevSelected =>
         prevSelected && prevSelected.id_bus === data.bus_id
           ? { ...prevSelected, penumpang: data.passenger_count }
@@ -165,9 +176,8 @@ export default function Page() {
       socket.off('bus_location', handleBusLocation);
       socket.off('passenger_update', handlePassengerUpdate);
     };
-  }, [buses]); // <-- Tambahkan 'buses' sebagai dependensi
-
-  // ... (Handler handleRouteSelect tetap sama)
+  }, []); // Array dependensi KOSONG sudah benar
+  
   const handleRouteSelect = async (routeSummary: any | null) => {
     if (routeSummary) {
       try {
@@ -186,19 +196,25 @@ export default function Page() {
 
   return (
     <div className="p-8">
-      <Header/>
+      <Header />
 
-      {/* Stats Cards (Sekarang akan menampilkan data yang benar) */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      {/* Stats Cards (Nama key sudah benar) */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
         <StatsCard
-          title="Walk"
-          count={stats?.active ?? 0}
+          title="Running"
+          count={stats?.active ?? 0} // 'active' = 'running'
           icon={<BusFront className="h-6 w-6" />}
           color="bg-gradient-to-r from-purple-500 to-indigo-600"
         />
         <StatsCard
-          title="Stop"
-          count={stats?.nonActive ?? 0}
+          title="Scheduled"
+          count={stats?.scheduled ?? 0}
+          icon={<CalendarClock className="h-6 w-6" />}
+          color="bg-gradient-to-r from-blue-400 to-cyan-500"
+        />
+        <StatsCard
+          title="Stopped"
+          count={stats?.nonActive ?? 0} // 'nonActive' = 'stopped'
           icon={<CircleOff className="h-6 w-6" />}
           color="bg-gradient-to-r from-orange-400 to-red-500"
         />
@@ -210,7 +226,6 @@ export default function Page() {
         />
       </div>
 
-      {/* DashboardClient */}
       <div className="mt-6">
         <DashboardClient
           buses={buses}

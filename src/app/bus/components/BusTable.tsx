@@ -14,7 +14,7 @@ interface Bus {
     plat_nomor: string;
     kapasitas: number;
     jenis_bus: string;
-    status: 'berjalan' | 'berhenti' | 'dalam perbaikan';
+    status: 'berjalan' | 'dijadwalkan' | 'berhenti' | 'dalam perbaikan';
 }
 
 export default function BusTable() {
@@ -131,7 +131,7 @@ export default function BusTable() {
                         filters={[
                             {
                                 label: 'Status',
-                                options: ['berjalan', 'berhenti', 'dalam perbaikan'],
+                                options: ['berjalan', 'dijadwalkan', 'berhenti', 'dalam perbaikan'],
                                 value: filterStatus,
                                 onChange: setFilterStatus,
                             },

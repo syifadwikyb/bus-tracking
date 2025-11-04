@@ -37,6 +37,7 @@ export type Bus = {
 
 export interface Stats {
   active: number;
+  scheduled: number;
   nonActive: number;
   maintenance: number;
 }

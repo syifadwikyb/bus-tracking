@@ -11,7 +11,7 @@ interface Bus {
     plat_nomor: string;
     kapasitas: number;
     jenis_bus: string;
-    status: 'berjalan' | 'berhenti' | 'dalam perbaikan';
+    status: 'berjalan' | 'dijadwalkan' | 'berhenti' | 'dalam perbaikan';
 }
 
 interface BusRowProps {
@@ -31,6 +31,11 @@ const StatusBadge = ({ status }: { status: Bus['status'] }) => {
             statusText = 'Berjalan';
             // Sesuai desain 'Active' (Hijau)
             statusClass = 'bg-green-100 text-green-700';
+            break;
+        case 'dijadwalkan':
+            statusText = 'Dijadwalkan';
+            // Sesuai desain 'Active' (Hijau)
+            statusClass = 'bg-blue-100 text-blue-700';
             break;
         case 'berhenti':
             statusText = 'Berhenti';
