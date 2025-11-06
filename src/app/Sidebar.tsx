@@ -23,7 +23,7 @@ type NavLinkProps = {
 // Komponen NavLink (di dalam Sidebar)
 const NavLink = ({ href, icon: Icon, children }: NavLinkProps) => {
     const pathname = usePathname(); // Hook untuk mendapatkan URL
-    const isActive = pathname.startsWith(href); // Logika 'active' yang dinamis
+    const isActive = pathname === href || pathname.startsWith(href + '/');
 
     return (
         <Link
