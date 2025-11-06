@@ -53,7 +53,7 @@ export default function Sidebar() {
                 <nav className="flex flex-col space-y-2">
                     <NavLink href="/dashboard" icon={LayoutDashboard}>Dashboard</NavLink>
                     <NavLink href="/bus" icon={Bus}>Bus</NavLink>
-                    <NavLink href="/bus-stop" icon={MapPin}>Bus Stop</NavLink>
+                    <NavLink href="/bus_stop" icon={MapPin}>Bus Stop</NavLink>
                     <NavLink href="/schedule" icon={CalendarDays}>Schedule</NavLink>
                     <NavLink href="/route" icon={Map}>Route</NavLink>
                     <NavLink href="/drivers" icon={Users}>Drivers</NavLink>
