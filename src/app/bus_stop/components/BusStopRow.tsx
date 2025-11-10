@@ -20,7 +20,7 @@ interface BusStopRowProps {
 
 export default function BusStopRow({ halte, onShow, onEdit, onDelete }: BusStopRowProps) {
     return (
-        <tr className="border-b hover:bg-gray-50 transition">
+        <tr className="hover:bg-gray-50 transition">
             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {halte.nama_halte}
             </td>

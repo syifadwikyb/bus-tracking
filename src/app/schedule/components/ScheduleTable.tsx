@@ -91,7 +91,7 @@ export default function ScheduleTable() {
                 />
 
                 <div className="flex items-center gap-2">
-                    <AddButton />
+                    <AddButton route="/schedule/action" />
                     <FilterDropdown
                         filters={[
                             {
