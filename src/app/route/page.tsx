@@ -3,10 +3,22 @@ import RouteTable from './components/RouteTable';
 
 // Ini adalah halaman utama untuk '/bus_stop/route'
 export default function RouteManagementPage() {
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+
+    if (hour >= 5 && hour < 11) return "Selamat Pagi Admin!";
+    if (hour >= 11 && hour < 15) return "Selamat Siang Admin!";
+    if (hour >= 15 && hour < 18) return "Selamat Sore Admin!";
+    return "Selamat Malam Admin!";
+  };
+
   return (
-    // 'p-8' adalah padding keliling (sesuai desain)
     <div className="p-8">
-      <Header/>
+      <Header
+        subtitle={getGreeting()}
+        title="Manajemen Rute"
+      />
+
       <RouteTable />
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { type Bus } from "../DashboardClient";
+import { API_URL } from '@/lib/config';
 
 type BusDetailProps = {
   bus: Bus | null;
@@ -42,7 +43,7 @@ export default function BusDetail({ bus }: BusDetailProps) {
             src={
               bus.foto.startsWith("http")
                 ? bus.foto
-                : `http://localhost:5000/${bus.foto}`
+                : `${API_URL}${bus.foto}`
             }
             alt="Bus Image"
             width={160}

@@ -3,15 +3,23 @@ import ScheduleTable from './components/ScheduleTable'; // Path ke komponen baru
 
 // Ini adalah halaman utama untuk '/schedule'
 export default function ScheduleManagementPage() {
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+
+    if (hour >= 5 && hour < 11) return "Selamat Pagi Admin!";
+    if (hour >= 11 && hour < 15) return "Selamat Siang Admin!";
+    if (hour >= 15 && hour < 18) return "Selamat Sore Admin!";
+    return "Selamat Malam Admin!";
+  };
+
   return (
     <div className="p-8">
-      {/* 1. Header Halaman */}
-      <Header/>
+      <Header
+        subtitle={getGreeting()}
+        title="Manajemen Penjadwalan"
+      />
 
-      {/* 2. Konten Utama (Tabel) */}
-      <div className="mt-8">
-        <ScheduleTable />
-      </div>
+      <ScheduleTable />
     </div>
   );
 }

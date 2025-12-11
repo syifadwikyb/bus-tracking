@@ -219,7 +219,7 @@ export default function MaintenanceTable() {
         </div>
       )}
     </div>
-    
+
     // 5. Komponen <ConfirmationModal> dihapus dari sini
   );
 }

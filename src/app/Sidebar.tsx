@@ -51,13 +51,13 @@ export default function Sidebar() {
                 </div>
 
                 <nav className="flex flex-col space-y-2">
-                    <NavLink href="/dashboard" icon={LayoutDashboard}>Dashboard</NavLink>
+                    <NavLink href="/dashboard" icon={LayoutDashboard}>Dasbor</NavLink>
                     <NavLink href="/bus" icon={Bus}>Bus</NavLink>
-                    <NavLink href="/bus_stop" icon={MapPin}>Bus Stop</NavLink>
-                    <NavLink href="/schedule" icon={CalendarDays}>Schedule</NavLink>
-                    <NavLink href="/route" icon={Map}>Route</NavLink>
-                    <NavLink href="/drivers" icon={Users}>Drivers</NavLink>
-                    <NavLink href="/maintenance" icon={Wrench}>Maintenance</NavLink>
+                    <NavLink href="/bus_stop" icon={MapPin}>Halte</NavLink>
+                    <NavLink href="/schedule" icon={CalendarDays}>Penjadwalan</NavLink>
+                    <NavLink href="/route" icon={Map}>Rute</NavLink>
+                    <NavLink href="/drivers" icon={Users}>Sopir</NavLink>
+                    <NavLink href="/maintenance" icon={Wrench}>Perawatan</NavLink>
                 </nav>
             </div>
 

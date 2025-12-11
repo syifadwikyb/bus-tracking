@@ -2,12 +2,12 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import dynamic from "next/dynamic";
-import polyline from "@mapbox/polyline";
+import polyline from "@mapbox/polyline"; // Pastikan sudah: npm install @mapbox/polyline
 import "leaflet/dist/leaflet.css";
 import { useMap } from "react-leaflet";
-import type { Bus } from "../DashboardClient"; // tipe Bus
+import type { Bus } from "../DashboardClient";
 
-// Dynamic import komponen Leaflet
+// Import Leaflet Dinamis (Wajib untuk Next.js)
 const MapContainer = dynamic(() => import("react-leaflet").then(mod => mod.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import("react-leaflet").then(mod => mod.TileLayer), { ssr: false });
 const Marker = dynamic(() => import("react-leaflet").then(mod => mod.Marker), { ssr: false });
@@ -20,16 +20,16 @@ interface MapViewProps {
   onBusClick: (bus: Bus | null) => void;
 }
 
-// Komponen bantu untuk memperbarui posisi peta
+// Komponen Update Peta Smooth
 function MapUpdater({ center }: { center: [number, number] | null }) {
   const map = useMap();
   useEffect(() => {
-    if (center) map.panTo(center, { animate: true });
+    if (center) map.flyTo(center, 14); // flyTo lebih smooth daripada panTo
   }, [center, map]);
   return null;
 }
 
-// Fungsi menghitung rotasi arah bus
+// Fungsi Rotasi (Bearing)
 const calculateBearing = (lat1: number, lon1: number, lat2: number, lon2: number) => {
   const toRad = (deg: number) => (deg * Math.PI) / 180;
   const toDeg = (rad: number) => (rad * 180) / Math.PI;
@@ -37,56 +37,57 @@ const calculateBearing = (lat1: number, lon1: number, lat2: number, lon2: number
   const lat1Rad = toRad(lat1);
   const lat2Rad = toRad(lat2);
   const y = Math.sin(dLon) * Math.cos(lat2Rad);
-  const x =
-    Math.cos(lat1Rad) * Math.sin(lat2Rad) -
+  const x = Math.cos(lat1Rad) * Math.sin(lat2Rad) -
     Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon);
   let bearing = toDeg(Math.atan2(y, x));
   if (bearing < 0) bearing += 360;
   return bearing;
 };
 
-// --- KOMPONEN UTAMA ---
 export default function MapView({ buses, selectedRoute, onBusClick }: MapViewProps) {
   const [L, setL] = useState<any>(null);
   const [halteIcon, setHalteIcon] = useState<any>(null);
-  const [busIcon, setBusIcon] = useState<any>(null);
   const [decodedPolyline, setDecodedPolyline] = useState<[number, number][] | null>(null);
 
   const lastPositions = useRef<Map<number, { lat: number, lon: number }>>(new Map());
   const rotations = useRef<Map<number, number>>(new Map());
 
-  // Import leaflet dan set ikon
+  // Init Leaflet & Icons
   useEffect(() => {
     import("leaflet").then((leaflet) => {
       setL(leaflet);
-      // Ikon halte
+
+      // Menggunakan link online untuk tes (bisa diganti path lokal nanti)
+      // Tujuannya memastikan icon muncul dulu meskipun path lokal salah
       setHalteIcon(
         leaflet.icon({
-          iconUrl: "/assets/icons/Bus-Stop.svg",
-          iconSize: [35, 35],
-          iconAnchor: [17, 35],
-        })
-      );
-
-      // Ikon bus
-      setBusIcon(
-        leaflet.icon({
-          iconUrl: "/assets/icons/bus.png",
-          iconSize: [40, 40],
-          iconAnchor: [20, 20],
+          iconUrl: "https://cdn-icons-png.flaticon.com/512/3448/3448339.png",
+          iconSize: [30, 30],
+          iconAnchor: [15, 30],
         })
       );
     });
   }, []);
 
-  // Decode polyline jika rute dipilih
+  // Decode Rute & Debugging
   useEffect(() => {
-    if (selectedRoute && selectedRoute.rute_polyline) {
-      try {
-        const decoded = polyline.decode(selectedRoute.rute_polyline);
-        setDecodedPolyline(decoded as [number, number][]);
-      } catch (e) {
-        console.error("Gagal decode polyline:", e);
+    if (selectedRoute) {
+      console.log("📍 [DEBUG] Data Rute Diterima:", selectedRoute);
+
+      // Cek variasi nama field polyline (rute_polyline vs polyline)
+      const polyString = selectedRoute.rute_polyline || selectedRoute.polyline;
+
+      if (polyString && typeof polyString === 'string') {
+        try {
+          const decoded = polyline.decode(polyString);
+          console.log("✅ Polyline decoded:", decoded.length, "points");
+          setDecodedPolyline(decoded as [number, number][]);
+        } catch (e) {
+          console.error("❌ Gagal decode polyline:", e);
+          setDecodedPolyline(null);
+        }
+      } else {
+        console.warn("⚠️ Polyline string kosong/null pada data rute.");
         setDecodedPolyline(null);
       }
     } else {
@@ -94,97 +95,103 @@ export default function MapView({ buses, selectedRoute, onBusClick }: MapViewPro
     }
   }, [selectedRoute]);
 
-  // Hitung rotasi bus
+  // Hitung Rotasi Bus
   useEffect(() => {
     buses.forEach(bus => {
-      if (bus.latitude && bus.longitude) {
+      // KONVERSI KE NUMBER (PENTING! Agar matematika tidak error NaN)
+      const lat = Number(bus.latitude);
+      const lon = Number(bus.longitude);
+
+      if (!isNaN(lat) && !isNaN(lon)) {
         const lastPos = lastPositions.current.get(bus.id_bus);
-        if (lastPos && (lastPos.lat !== bus.latitude || lastPos.lon !== bus.longitude)) {
-          const newRotation = calculateBearing(
-            lastPos.lat,
-            lastPos.lon,
-            bus.latitude,
-            bus.longitude
-          );
+
+        if (lastPos && (lastPos.lat !== lat || lastPos.lon !== lon)) {
+          const newRotation = calculateBearing(lastPos.lat, lastPos.lon, lat, lon);
           rotations.current.set(bus.id_bus, newRotation);
         } else if (!lastPos) {
           rotations.current.set(bus.id_bus, 0);
         }
-        lastPositions.current.set(bus.id_bus, { lat: bus.latitude, lon: bus.longitude });
+
+        lastPositions.current.set(bus.id_bus, { lat, lon });
       }
     });
   }, [buses]);
 
-  if (!L || !halteIcon || !busIcon) {
-    return (
-      <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p>Memuat peta...</p>
-      </div>
-    );
+  if (!L || !halteIcon) {
+    return <div className="flex h-full items-center justify-center p-10">Memuat Peta...</div>;
   }
 
-  const activeBuses = buses.filter(b => b.latitude && b.longitude);
+  // Filter Bus Valid (Hanya yang punya koordinat angka valid)
+  const activeBuses = buses.filter(b =>
+    b.latitude && b.longitude &&
+    !isNaN(Number(b.latitude)) && !isNaN(Number(b.longitude))
+  );
+
   const mapCenter: [number, number] = activeBuses.length > 0
-    ? [activeBuses[0].latitude!, activeBuses[0].longitude!]
-    : [-6.9175, 107.6191]; // Default Bandung
+    ? [Number(activeBuses[0].latitude), Number(activeBuses[0].longitude)]
+    : [-6.805, 110.84]; // Default Kudus
 
   return (
-    <div style={{ height: "100%", width: "100%" }}>
+    <div style={{ height: "100%", width: "100%", borderRadius: "12px", overflow: "hidden" }}>
       <MapContainer center={mapCenter} zoom={13} style={{ height: "100%", width: "100%" }}>
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' />
-        {/* Polyline Rute */}
-        {decodedPolyline && <Polyline positions={decodedPolyline} color="blue" />}
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; OpenStreetMap contributors'
+        />
 
-        {/* Marker Halte */}
-        {selectedRoute && selectedRoute.halte &&
+        {/* 1. POLYLINE RUTE */}
+        {decodedPolyline && <Polyline positions={decodedPolyline} color="blue" weight={5} opacity={0.7} />}
+
+        {/* 2. MARKER HALTE */}
+        {selectedRoute && selectedRoute.halte && Array.isArray(selectedRoute.halte) &&
           selectedRoute.halte.map((halte: any) => (
             <Marker
               key={halte.id_halte}
-              position={[halte.latitude, halte.longitude]}
+              position={[Number(halte.latitude), Number(halte.longitude)]}
               icon={halteIcon}
             >
               <Popup>
-                <b>Halte {halte.urutan}</b><br />
-                {halte.nama_halte}
+                <b>Halte: {halte.nama_halte}</b>
               </Popup>
             </Marker>
           ))}
 
-        {/* Marker Bus */}
-        {buses.map(bus => {
-          if (bus.latitude && bus.longitude) {
-            const rotation = rotations.current.get(bus.id_bus) || 0;
+        {/* 3. MARKER BUS */}
+        {activeBuses.map(bus => {
+          const lat = Number(bus.latitude);
+          const lon = Number(bus.longitude);
+          const rotation = rotations.current.get(bus.id_bus) || 0;
 
-            // Menggunakan divIcon agar bisa rotasi
-            const dynamicBusIcon = L.divIcon({
-              className: "custom-bus-icon",
-              html: `<img src="/assets/icons/bus.png" style="width: 100%; height: 100%; transform: rotate(${rotation}deg);" />`,
-              iconSize: [40, 40],
-              iconAnchor: [20, 20],
-            });
+          // Custom Icon dengan Rotasi (HTML divIcon)
+          const dynamicBusIcon = L.divIcon({
+            className: "custom-bus-icon",
+            // Pastikan path image benar. Tambahkan onerror untuk fallback.
+            html: `<img src="/assets/icons/bus.png" 
+                   style="width: 100%; height: 100%; transform: rotate(${rotation}deg); transition: transform 0.5s;" 
+                   onerror="this.src='https://cdn-icons-png.flaticon.com/512/3448/3448339.png'"/>`,
+            iconSize: [40, 40],
+            iconAnchor: [20, 20],
+          });
 
-            return (
-              <Marker
-                key={bus.id_bus}
-                position={[bus.latitude, bus.longitude]}
-                icon={dynamicBusIcon}
-                eventHandlers={{
-                  click: () => onBusClick(bus),
-                }}
-              >
-                <Popup>
-                  <b>{bus.kode_bus || bus.plat_nomor}</b> <br />
-                  Supir: {bus.nama || "N/A"} <br />
-                  Penumpang: {bus.penumpang} / {bus.kapasitas}
-                </Popup>
-              </Marker>
-            );
-          }
-          return null;
+          return (
+            <Marker
+              key={bus.id_bus}
+              position={[lat, lon]}
+              icon={dynamicBusIcon}
+              eventHandlers={{ click: () => onBusClick(bus) }}
+            >
+              <Popup>
+                <div className="font-sans">
+                  <b className="block text-sm mb-1">{bus.kode_bus || bus.plat_nomor}</b>
+                  <p className="text-xs m-0">Status: {bus.status}</p>
+                  <p className="text-xs m-0">Penumpang: {bus.penumpang}</p>
+                </div>
+              </Popup>
+            </Marker>
+          );
         })}
 
-        {/* Pusatkan peta */}
-        <MapUpdater center={mapCenter} />
+        <MapUpdater center={activeBuses.length > 0 ? mapCenter : null} />
       </MapContainer>
     </div>
   );

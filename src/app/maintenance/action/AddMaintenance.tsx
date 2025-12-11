@@ -147,18 +147,31 @@ const AddMaintenance: React.FC = () => {
         setSelectedBus(null);
     };
 
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+
+        if (hour >= 5 && hour < 11) return "Selamat Pagi Admin!";
+        if (hour >= 11 && hour < 15) return "Selamat Siang Admin!";
+        if (hour >= 15 && hour < 18) return "Selamat Sore Admin!";
+        return "Selamat Malam Admin!";
+    };
+
     return (
         <div className="">
-            <Header />
+            <Header
+                subtitle={getGreeting()}
+                title="Tambah Data Perawatan"
+            />
+
             <div className="p-6 bg-white rounded-2xl shadow-md">
                 <p className="text-sm text-gray-500 mb-6" aria-label="breadcrumb">
                     <Link href="/maintenance"
                         className="hover:text-blue-600 hover:underline transition-colors">
-                        Management Maintenance
+                        Manajemen Perawatan
                     </Link>
                     <span className="mx-2">/</span>
                     <span className="font-medium text-gray-700">
-                        Edit Maintenance
+                        Tambah Data Perawatan
                     </span>
                 </p>
 

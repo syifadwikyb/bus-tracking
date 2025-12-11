@@ -1,0 +1,147 @@
+'use client';
+
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { API_URL } from "@/lib/config";
+import Link from 'next/link';
+import Header from "@/components/Header";
+import dynamic from 'next/dynamic';
+
+// Import Map secara dinamis (PENTING untuk Next.js)
+const RouteMap = dynamic(() => import('../components/RouteMap'), { ssr: false });
+
+export default function AddRoute() {
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+
+    // State Form
+    const [formData, setFormData] = useState({
+        kode_jalur: "",
+        nama_jalur: "",
+        status: "aktif",
+    });
+
+    // State Koordinat Polyline
+    const [points, setPoints] = useState<[number, number][]>([]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleResetMap = () => {
+        setPoints([]); // Hapus semua titik
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (points.length < 2) {
+            alert("⚠️ Harap buat jalur di peta minimal 2 titik!");
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const polylineString = JSON.stringify(points);
+
+            const payload = {
+                kode_jalur: formData.kode_jalur,
+                nama_jalur: formData.nama_jalur,
+                // 👇 PERBAIKAN PENTING: Sesuaikan dengan ENUM Database (berjalan/berhenti)
+                status: formData.status === 'aktif' ? 'berjalan' : 'berhenti',
+                rute_polyline: polylineString,
+            };
+
+            console.log("🚀 Sending Payload:", payload); // Cek di Console
+
+            const response = await fetch(`${API_URL}/api/jalur`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+
+            // 👇 PERBAIKAN DEBUGGING: Baca pesan error dari server
+            const result = await response.json().catch(() => null);
+
+            if (!response.ok) {
+                // Tampilkan pesan spesifik dari backend (misal: "Kode jalur sudah ada")
+                throw new Error(result?.message || `Gagal menyimpan rute (${response.status})`);
+            }
+
+            alert("✅ Rute berhasil ditambahkan!");
+            router.push("/route");
+        } catch (error: any) {
+            console.error("❌ Error Submit:", error);
+            alert(`❌ Error: ${error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="p-8">
+            <Header subtitle="Manajemen Rute" title="Tambah Rute Baru" />
+
+            <div className="p-6 bg-white rounded-2xl shadow-md">
+                <p className="text-sm text-gray-500 mb-6">
+                    <Link href="/route" className="hover:text-blue-600 hover:underline">List Rute</Link>
+                    <span className="mx-2">/</span>
+                    <span className="font-medium text-gray-700">Tambah Rute</span>
+                </p>
+
+                <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                    {/* KOLOM KIRI (Input Data) */}
+                    <div className="lg:col-span-1 space-y-4">
+                        <div>
+                            <label className="block font-medium mb-1">Kode Jalur</label>
+                            <input type="text" name="kode_jalur" value={formData.kode_jalur} onChange={handleChange} className="w-full border border-blue-400 rounded-xl p-2" required placeholder="Contoh: RUTE-A1" />
+                        </div>
+                        <div>
+                            <label className="block font-medium mb-1">Nama Jalur</label>
+                            <input type="text" name="nama_jalur" value={formData.nama_jalur} onChange={handleChange} className="w-full border border-blue-400 rounded-xl p-2" required placeholder="Contoh: Pasar - Terminal" />
+                        </div>
+                        <div>
+                            <label className="block font-medium mb-1">Status</label>
+                            <select name="status" value={formData.status} onChange={handleChange} className="w-full border border-blue-400 rounded-xl p-2">
+                                <option value="aktif">Aktif</option>
+                                <option value="tidak aktif">Tidak Aktif</option>
+                            </select>
+                        </div>
+
+                        <div className="pt-4 border-t">
+                            <p className="text-sm text-gray-500 mb-2">Instruksi Peta:</p>
+                            <ul className="text-xs text-gray-400 list-disc ml-4 mb-4">
+                                <li>Klik pada peta untuk menambahkan titik.</li>
+                                <li>Hubungkan titik untuk membentuk jalur.</li>
+                                <li>Minimal 2 titik diperlukan.</li>
+                            </ul>
+                            <button type="button" onClick={handleResetMap} className="w-full py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 text-sm mb-2">
+                                ↺ Reset Gambar Peta
+                            </button>
+                        </div>
+
+                        <div className="flex justify-end gap-2 pt-4">
+                            <Link href="/route" className="px-4 py-2 bg-red-100 text-red-600 rounded-lg">Batal</Link>
+                            <button type="submit" disabled={loading} className="px-4 py-2 bg-teal-100 text-teal-700 rounded-lg font-medium hover:bg-teal-200">
+                                {loading ? "Menyimpan..." : "Simpan Rute"}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* KOLOM KANAN (MAPS INTERAKTIF) */}
+                    <div className="lg:col-span-2 h-[500px] border border-gray-300 rounded-xl overflow-hidden relative">
+                        {/* Panggil komponen Map */}
+                        <RouteMap points={points} setPoints={setPoints} />
+
+                        <div className="absolute top-2 right-2 bg-white px-3 py-1 rounded-md shadow z-[1000] text-xs font-bold">
+                            Total Titik: {points.length}
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    );
+}

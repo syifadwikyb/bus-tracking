@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import ScheduleRow from './ScheduleRow';
 import SearchBar from '@/components/SearchBar';
 import AddButton from '@/components/AddButton';
@@ -19,6 +20,7 @@ interface Schedule {
 }
 
 export default function ScheduleTable() {
+    const router = useRouter();
     const [allSchedules, setAllSchedules] = useState<Schedule[]>([]);
     const [filtered, setFiltered] = useState<Schedule[]>([]);
     const [loading, setLoading] = useState(true);
@@ -27,55 +29,67 @@ export default function ScheduleTable() {
     const [page, setPage] = useState(1);
     const perPage = 7;
 
-    const handleShow = (s: Schedule) => alert(`Lihat jadwal bus: ${s.bus.plat_nomor}`);
-    const handleEdit = (s: Schedule) => alert(`Edit jadwal bus: ${s.bus.plat_nomor}`);
-    const handleDelete = (s: Schedule) => alert(`Hapus jadwal ${s.bus.plat_nomor}?`);
+    async function fetchSchedules() {
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_URL}/api/schedules`);
+            if (!res.ok) throw new Error("Gagal fetch");
+            const data = await res.json();
+            const list = Array.isArray(data.data) ? data.data : (Array.isArray(data) ? data : []);
+            setAllSchedules(list);
+            setFiltered(list);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     useEffect(() => {
-        const fetchSchedules = async () => {
-            setLoading(true);
-            try {
-                const res = await fetch(`${API_URL}/api/schedules`);
-                if (!res.ok) throw new Error('Gagal memuat data jadwal');
-                const data = await res.json();
-
-                if (Array.isArray(data.data)) {
-                    setAllSchedules(data.data);
-                    setFiltered(data.data);
-                } else if (Array.isArray(data)) {
-                    setAllSchedules(data);
-                    setFiltered(data);
-                } else {
-                    console.error('Format data API tidak sesuai:', data);
-                }
-            } catch (e) {
-                console.error(e);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchSchedules();
     }, []);
 
     useEffect(() => {
         let data = allSchedules;
-
         if (search) {
-            data = data.filter(
-                (s) =>
-                    s.bus?.plat_nomor?.toLowerCase().includes(search.toLowerCase()) ||
-                    s.driver?.nama?.toLowerCase().includes(search.toLowerCase())
+            data = data.filter((s) =>
+                s.bus?.plat_nomor?.toLowerCase().includes(search.toLowerCase()) ||
+                s.driver?.nama?.toLowerCase().includes(search.toLowerCase())
             );
         }
-
         if (filterStatus) {
             data = data.filter((s) => s.status === filterStatus);
         }
-
         setFiltered(data);
         setPage(1);
     }, [search, filterStatus, allSchedules]);
+
+    function handleShow(s: Schedule) {
+        router.push(`/schedule/action_schedule?mode=show&id=${s.id_schedule}`);
+    }
+
+    function handleEdit(s: Schedule) {
+        router.push(`/schedule/action_schedule?mode=edit&id=${s.id_schedule}`);
+    }
+
+    async function handleDelete(s: Schedule) {
+        const confirmDelete = confirm(`Apakah Anda yakin ingin menghapus jadwal Bus ${s.bus.plat_nomor}?`);
+        if (!confirmDelete) return;
+
+        try {
+            const res = await fetch(`${API_URL}/api/schedules/${s.id_schedule}`, {
+                method: "DELETE",
+            });
+
+            if (!res.ok) throw new Error("Gagal menghapus jadwal");
+
+            alert("✅ Jadwal berhasil dihapus");
+            fetchSchedules();
+        } catch (error) {
+            console.error(error);
+            alert("❌ Gagal menghapus jadwal.");
+        }
+    }
 
     const totalPages = Math.ceil(filtered.length / perPage);
     const currentData = filtered.slice((page - 1) * perPage, page * perPage);
@@ -87,11 +101,10 @@ export default function ScheduleTable() {
                     value={search}
                     onChange={setSearch}
                     onClear={() => setSearch('')}
-                    onSubmit={(e) => e.preventDefault()} // Tambahkan ini
+                    onSubmit={(e) => e.preventDefault()}
                 />
-
                 <div className="flex items-center gap-2">
-                    <AddButton route="/schedule/action" />
+                    <AddButton route="/schedule/action_schedule" />
                     <FilterDropdown
                         filters={[
                             {
@@ -109,37 +122,18 @@ export default function ScheduleTable() {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                Plat Nomor
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                Driver
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                Hari & Tanggal
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                Jam Mulai
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                Jam Selesai
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                Status
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                Action
-                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Plat Nomor</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Driver</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Tanggal</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Jam Mulai</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Jam Selesai</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Status</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Aksi</th>
                         </tr>
                     </thead>
-
                     <tbody className="bg-white divide-y divide-gray-200">
                         {loading ? (
-                            <tr>
-                                <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
-                                    Memuat data...
-                                </td>
-                            </tr>
+                            <tr><td colSpan={7} className="px-6 py-4 text-center text-gray-500">Memuat data...</td></tr>
                         ) : currentData.length > 0 ? (
                             currentData.map((schedule) => (
                                 <ScheduleRow
@@ -151,11 +145,7 @@ export default function ScheduleTable() {
                                 />
                             ))
                         ) : (
-                            <tr>
-                                <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
-                                    Tidak ada data yang cocok.
-                                </td>
-                            </tr>
+                            <tr><td colSpan={7} className="px-6 py-4 text-center text-gray-500">Tidak ada data.</td></tr>
                         )}
                     </tbody>
                 </table>

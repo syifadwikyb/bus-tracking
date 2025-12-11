@@ -125,6 +125,9 @@ const EditMaintenance: React.FC<{ id: string }> = ({ id }) => {
         e.preventDefault();
         setLoading(true);
 
+        console.log("🔍 Cek URL:", `${API_URL}/api/maintenance/${id}`);
+        console.log("📦 Cek ID:", id);
+
         try {
             const payload = {
                 bus_id: formData.busId,
@@ -135,8 +138,8 @@ const EditMaintenance: React.FC<{ id: string }> = ({ id }) => {
                 status: formData.status,
             };
 
-            const response = await fetch(`${API_URL}/api/maintenance/${id}`, { // <-- Gunakan ID
-                method: "PUT", // <-- Gunakan PUT
+            const response = await fetch(`${API_URL}/api/maintenance/${id}`, {
+                method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
             });
@@ -157,22 +160,35 @@ const EditMaintenance: React.FC<{ id: string }> = ({ id }) => {
         }
     };
 
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+
+        if (hour >= 5 && hour < 11) return "Selamat Pagi Admin!";
+        if (hour >= 11 && hour < 15) return "Selamat Siang Admin!";
+        if (hour >= 15 && hour < 18) return "Selamat Sore Admin!";
+        return "Selamat Malam Admin!";
+    };
+
     if (loadingData) {
         return <div className="p-6 text-center">Memuat data...</div>;
     }
 
     return (
         <div className="">
-            <Header />
+            <Header
+                subtitle={getGreeting()}
+                title="Edit Perawatan"
+            />
+
             <div className="p-6 bg-white rounded-2xl shadow-md">
                 <p className="text-sm text-gray-500 mb-6" aria-label="breadcrumb">
                     <Link href="/maintenance"
                         className="hover:text-blue-600 hover:underline transition-colors">
-                        Management Maintenance
+                        Manajemen Perawatan
                     </Link>
                     <span className="mx-2">/</span>
                     <span className="font-medium text-gray-700">
-                        Edit Maintenance
+                        Edit Perawatan
                     </span>
                 </p>
 

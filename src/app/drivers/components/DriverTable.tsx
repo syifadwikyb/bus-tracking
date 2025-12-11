@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation'; // ➕ Import Router
 import DriverRow from './DriverRow';
 import SearchBar from '@/components/SearchBar';
 import AddButton from '@/components/AddButton';
@@ -8,7 +9,6 @@ import FilterDropdown from '@/components/FilterDropdown';
 import Pagination from '@/components/Pagination';
 import { API_URL } from '@/lib/config';
 
-// Tipe data Driver
 interface Driver {
   id_driver: number;
   kode_driver: string;
@@ -19,69 +19,81 @@ interface Driver {
 }
 
 export default function DriverTable() {
+  const router = useRouter(); // ➕ Init Router
   const [allDrivers, setAllDrivers] = useState<Driver[]>([]);
   const [filteredDrivers, setFilteredDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // ... state lain tetap sama ...
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const perPage = 7;
 
-  const handleShow = (driver: Driver) => alert(`Detail: ${driver.nama}`);
-  const handleEdit = (driver: Driver) => alert(`Edit: ${driver.nama}`);
-  const handleDelete = (driver: Driver) => alert(`Hapus: ${driver.nama}?`);
+  // Fetch Data
+  async function fetchDrivers() {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/drivers`);
+      if (!res.ok) throw new Error('Gagal fetch data');
+      const data = await res.json();
+      const list = Array.isArray(data.data) ? data.data : (Array.isArray(data) ? data : []);
+      setAllDrivers(list);
+      setFilteredDrivers(list);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
-  // --- Fetch Data ---
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`${API_URL}/api/drivers`);
-        if (!res.ok) throw new Error('Gagal fetch data driver');
-
-        const data = await res.json();
-
-        // Jika respons berisi objek dengan properti "data"
-        if (Array.isArray(data.data)) {
-          setAllDrivers(data.data);
-          setFilteredDrivers(data.data);
-        } else if (Array.isArray(data)) {
-          setAllDrivers(data);
-          setFilteredDrivers(data);
-        } else {
-          console.error('Format data API tidak sesuai:', data);
-        }
-      } catch (err) {
-        if (err instanceof Error) console.error(err.message);
-        else console.error('Unknown fetch error', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+    fetchDrivers();
   }, []);
 
-  // --- Filter & Search (Client-side) ---
+  // Filter Logic (Tetap sama)
   useEffect(() => {
     let data = allDrivers;
-
     if (search) {
-      data = data.filter(
-        (d) =>
-          (d.nama && d.nama.toLowerCase().includes(search.toLowerCase())) ||
-          (d.nomor_telepon && d.nomor_telepon.toLowerCase().includes(search.toLowerCase()))
+      data = data.filter((d) =>
+        (d.nama && d.nama.toLowerCase().includes(search.toLowerCase())) ||
+        (d.nomor_telepon && d.nomor_telepon.toLowerCase().includes(search.toLowerCase()))
       );
     }
-
     if (filterStatus) {
       data = data.filter((d) => d.status === filterStatus);
     }
-
     setFilteredDrivers(data);
     setCurrentPage(1);
   }, [search, filterStatus, allDrivers]);
 
-  // --- Pagination ---
+  // --- NAVIGASI ACTION ---
+  const handleShow = (driver: Driver) => {
+    router.push(`/driver/action_driver?mode=show&id=${driver.id_driver}`);
+  };
+
+  const handleEdit = (driver: Driver) => {
+    router.push(`/driver/action_driver?mode=edit&id=${driver.id_driver}`);
+  };
+
+  // --- DELETE FUNCTION ---
+  const handleDelete = async (driver: Driver) => {
+    if (!confirm(`Hapus driver ${driver.nama}?`)) return;
+
+    try {
+      const res = await fetch(`${API_URL}/api/drivers/${driver.id_driver}`, {
+        method: 'DELETE'
+      });
+      if (!res.ok) throw new Error("Gagal menghapus driver");
+
+      alert("✅ Driver berhasil dihapus");
+      fetchDrivers(); // Refresh data
+    } catch (error) {
+      console.error(error);
+      alert("❌ Gagal menghapus driver.");
+    }
+  };
+
   const totalPages = Math.ceil(filteredDrivers.length / perPage);
   const indexOfLast = currentPage * perPage;
   const indexOfFirst = indexOfLast - perPage;
@@ -89,46 +101,31 @@ export default function DriverTable() {
 
   return (
     <div className="bg-white rounded-lg shadow-lg">
-      {/* Toolbar */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4 border-b">
-        <SearchBar
-          value={search}
-          onChange={setSearch}
-          onClear={() => setSearch('')}
-          onSubmit={(e) => e.preventDefault()}
-        />
+        <SearchBar value={search} onChange={setSearch} onClear={() => setSearch('')} onSubmit={(e) => e.preventDefault()} />
         <div className="flex items-center gap-2">
-          <AddButton />
+          {/* 👇 Update Route ke action_driver */}
+          <AddButton route="/drivers/action_driver" />
           <FilterDropdown
-            filters={[
-              {
-                label: 'Status',
-                options: ['berjalan', 'berhenti', 'dijadwalkan'],
-                value: filterStatus,
-                onChange: setFilterStatus,
-              },
-            ]}
+            filters={[{ label: 'Status', options: ['berjalan', 'berhenti', 'dijadwalkan'], value: filterStatus, onChange: setFilterStatus }]}
           />
         </div>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nama</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tanggal Lahir</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">No. Telepon</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Nama</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Tanggal Lahir</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">No. Telepon</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Action</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {loading ? (
-              <tr>
-                <td colSpan={5} className="px-6 py-4 text-center text-gray-500">Memuat data...</td>
-              </tr>
+              <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">Memuat data...</td></tr>
             ) : currentData.length > 0 ? (
               currentData.map((driver) => (
                 <DriverRow
@@ -140,24 +137,15 @@ export default function DriverTable() {
                 />
               ))
             ) : (
-              <tr>
-                <td colSpan={5} className="px-6 py-4 text-center text-gray-500">Tidak ada data yang cocok.</td>
-              </tr>
+              <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">Tidak ada data.</td></tr>
             )}
           </tbody>
         </table>
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="px-6 py-3 border-t">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPrev={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-            onNext={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-            onPageSelect={setCurrentPage}
-          />
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPrev={() => setCurrentPage((p) => Math.max(p - 1, 1))} onNext={() => setCurrentPage((p) => Math.min(p + 1, totalPages))} onPageSelect={setCurrentPage} />
         </div>
       )}
     </div>
