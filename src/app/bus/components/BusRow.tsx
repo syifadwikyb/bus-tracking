@@ -22,40 +22,32 @@ interface BusRowProps {
 }
 
 // Komponen Badge Status
-const StatusBadge = ({ status }: { status: Bus['status'] }) => {
-    let statusText: string;
-    let statusClass: string;
+// BusRow.tsx
 
-    switch (status) {
-        case 'berjalan':
-            statusText = 'Berjalan';
-            // Sesuai desain 'Active' (Hijau)
-            statusClass = 'bg-green-100 text-green-700';
-            break;
-        case 'dijadwalkan':
-            statusText = 'Dijadwalkan';
-            // Sesuai desain 'Active' (Hijau)
-            statusClass = 'bg-blue-100 text-blue-700';
-            break;
-        case 'berhenti':
-            statusText = 'Berhenti';
-            // Oranye untuk 'Berhenti'
-            statusClass = 'bg-orange-100 text-orange-700';
-            break;
-        case 'dalam perbaikan':
-            statusText = 'Perbaikan';
-            // Abu-abu untuk status netral
-            statusClass = 'bg-gray-200 text-gray-800';
-            break;
-        default:
-            statusText = 'Unknown';
-            statusClass = 'bg-gray-100 text-gray-700';
+const StatusBadge = ({ status }: { status: Bus['status'] }) => {
+    // Normalisasi string (jaga-jaga kalau ada huruf besar dari DB lama)
+    const normalizedStatus = status ? status.toLowerCase() : '';
+
+    let statusText = '';
+    let statusClass = '';
+
+    if (normalizedStatus === 'berjalan') {
+        statusText = 'Berjalan'; // Running
+        statusClass = 'bg-green-100 text-green-700 border border-green-200';
+    } else if (normalizedStatus === 'dijadwalkan') {
+        statusText = 'Dijadwalkan'; // Scheduled
+        statusClass = 'bg-blue-100 text-blue-700 border border-blue-200';
+    } else if (normalizedStatus === 'dalam perbaikan') {
+        statusText = 'Perbaikan'; // Maintenance
+        statusClass = 'bg-yellow-100 text-yellow-800 border border-yellow-200';
+    } else {
+        // Default ke Berhenti untuk semua status lain
+        statusText = 'Berhenti'; // Stopped
+        statusClass = 'bg-gray-100 text-gray-600 border border-gray-200';
     }
 
     return (
-        <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold ${statusClass}`}
-        >
+        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusClass}`}>
             {statusText}
         </span>
     );

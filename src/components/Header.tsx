@@ -10,7 +10,7 @@ export default function Header({ subtitle, title }: HeaderProps) {
         <header className="flex items-center justify-between mb-6">
             <div>
                 <h3 className="text-lg font-medium text-gray-600">{subtitle}</h3>
-                <h2 className="text-3xl font-bold text-gray-900">{title}</h2>
+                <h2 className="text-3xl font-bold text-gray-900">{title} KURANG BAGIAN STATS DAN DATABASE CHART</h2>
             </div>
 
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 shadow-md">

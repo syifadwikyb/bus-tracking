@@ -37,10 +37,9 @@ interface ApiStats {
   scheduled: number;
 }
 
-// Interface Payload Socket
 interface SocketLocationData {
-  id_bus?: number; // Backend mungkin kirim ini
-  bus_id?: number; // Atau ini
+  id_bus?: number;
+  bus_id?: number;
   latitude: number;
   longitude: number;
   speed: number;
@@ -91,6 +90,35 @@ export default function Page() {
   const [selectedRoute, setSelectedRoute] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    // Jika data kosong, jangan hitung dulu
+    if (buses.length === 0 && loading) return;
+
+    // Fungsi normalisasi biar aman
+    const normalize = (s: string | undefined) => s ? s.toLowerCase().trim() : '';
+
+    // HITUNG STATISTIK (LOGIKA PASTI)
+    const runningCount = buses.filter(b => normalize(b.status) === 'berjalan').length;
+
+    const scheduledCount = buses.filter(b => normalize(b.status) === 'dijadwalkan').length;
+
+    const maintenanceCount = buses.filter(b => normalize(b.status).includes('perbaikan')).length;
+
+    // Stopped adalah SISA dari total bus
+    // (Total - Running - Scheduled - Maintenance)
+    // Ini menjamin angkanya pas.
+    const totalBus = buses.length;
+    const stoppedCount = totalBus - (runningCount + scheduledCount + maintenanceCount);
+
+    setStats({
+      active: runningCount,       // Harus bernilai 1 (sesuai kasus Anda)
+      scheduled: scheduledCount,  // Harus bernilai 2
+      maintenance: maintenanceCount,
+      nonActive: stoppedCount < 0 ? 0 : stoppedCount // Harusnya bernilai 1
+    });
+
+  }, [buses, loading]);
+
   // 1. FETCH DATA AWAL (HTTP)
   useEffect(() => {
     const fetchData = async () => {
@@ -109,21 +137,11 @@ export default function Page() {
         const routesData = await routesRes.json();
 
         const liveBusData: ApiBus[] = mainData.liveBuses;
-        const statsData: ApiStats = mainData.stats;
-
         const mappedBuses = liveBusData.map(convertApiBusToBus);
 
         setBuses(mappedBuses);
         setRoutes(routesData);
-
-        // Set stats awal dari database
-        setStats({
-          active: statsData.running ?? 0,
-          scheduled: statsData.scheduled ?? 0,
-          nonActive: statsData.stopped ?? 0,
-          maintenance: statsData.maintenance ?? 0,
-        });
-
+        // Kita TIDAK PERLU setStats di sini lagi, karena useEffect di atas akan mengurusnya.
       } catch (error) {
         console.error('Gagal mengambil data dashboard:', error);
       } finally {
@@ -140,50 +158,31 @@ export default function Page() {
 
     // Handler Lokasi
     const handleBusLocation = (data: SocketLocationData) => {
-      // Pastikan kita menangkap ID yang benar (backend kirim id_bus atau bus_id)
       const targetId = data.id_bus || data.bus_id;
       if (!targetId) return;
 
       setBuses((currentBuses) => {
-        // Cek apakah bus ada di list
+        // Cek apakah bus ada
         const exists = currentBuses.some(b => b.id_bus === targetId);
+        if (!exists) return currentBuses;
 
-        if (!exists) return currentBuses; // Jika bus baru (tidak ada di DB awal), abaikan dulu agar aman
-
-        // Update bus yang sesuai (IMMUTABLE UPDATE - Tidak menambah array)
-        const updatedBuses = currentBuses.map((bus) => {
+        // Update bus
+        return currentBuses.map((bus) => {
           if (bus.id_bus === targetId) {
             return {
               ...bus,
               latitude: data.latitude,
               longitude: data.longitude,
-              // KUNCI PERBAIKAN: Paksa status jadi 'berjalan' karena menerima data lokasi
+              // ✅ Paksa status jadi 'berjalan' saat terima lokasi
               status: 'berjalan',
               terakhir_dilihat: new Date().toISOString()
             };
           }
           return bus;
         });
-
-        // HITUNG ULANG STATS DI SINI (Supaya akurat dan tidak nambah terus)
-        const runningCount = updatedBuses.filter(b => b.status === 'berjalan').length;
-        // Bus berhenti adalah bus yang tidak berjalan & tidak maintenance
-        const stoppedCount = updatedBuses.filter(b => b.status !== 'berjalan' && b.status !== 'dalam perbaikan').length;
-
-        setStats(prevStats => {
-          if (!prevStats) return null;
-          return {
-            ...prevStats,
-            active: runningCount,
-            nonActive: stoppedCount
-            // maintenance & scheduled tetap pakai nilai lama karena tidak berubah realtime via lokasi
-          };
-        });
-
-        return updatedBuses;
       });
 
-      // Update juga selectedBus jika sedang dipilih agar popup di peta ikut berubah
+      // ✅ Update selected bus agar popup di peta ikut bergerak
       setSelectedBus((prev) => {
         if (prev && prev.id_bus === targetId) {
           return {
@@ -216,7 +215,7 @@ export default function Page() {
       );
     };
 
-    socket.on('bus_location', handleBusLocation); // Pastikan nama event sama dengan backend (emitBusUpdate)
+    socket.on('bus_location', handleBusLocation);
     socket.on('passenger_update', handlePassengerUpdate);
 
     return () => {

@@ -1,11 +1,10 @@
-// app/bus_stop/dashboard/DashboardClient.tsx
 'use client';
 
 import MapView from './components/MapView';
 import BusTable from './components/BusTable';
 import DriverInfo from './components/DriverInfo';
 import BusDetail from './components/BusDetail';
-import BusActivityChart from './components/BusActivityChart'; // chart baru ✔
+import BusActivityChart from './components/BusActivityChart';
 
 // Tipe Bus
 export type Bus = {
@@ -63,10 +62,12 @@ export default function DashboardClient({
     );
   }
 
-  // bus aktif adalah yang punya posisi
-  const activeBuses = buses.filter(bus =>
-    bus.status === "berjalan" || (bus.latitude && bus.longitude)
-  );
+  const activeBuses = buses.filter((bus) => {
+    const status = bus.status?.toLowerCase();
+    const hasCoords = bus.latitude && bus.longitude;
+
+    return status === 'berjalan' && hasCoords;
+  });
 
   // Placeholder bus kosong jika belum dipilih
   const emptyBus: Bus = {
@@ -106,7 +107,7 @@ export default function DashboardClient({
                 const routeSummary = routes.find(r => r.id_jalur === routeId);
                 onRouteSelect(routeSummary || null);
               }}
-              className="px-3 py-1 border border-gray-300 rounded-md"
+              className="px-3 py-1 border border-gray-300 rounded-md text-sm"
             >
               <option value="">Pilih Rute</option>
               {routes.map(route => (
@@ -117,7 +118,10 @@ export default function DashboardClient({
             </select>
           </div>
 
-          <div className="h-[400px] w-full">
+          <div className="h-[400px] w-full rounded-lg overflow-hidden border border-gray-200">
+            {/* ✅ PENTING: Kita kirim 'buses' (semua data) ke MapView. 
+               Pastikan di dalam file MapView.tsx logic filternya BENAR.
+            */}
             <MapView
               buses={buses}
               selectedRoute={selectedRoute}
@@ -134,6 +138,7 @@ export default function DashboardClient({
             </h3>
           </div>
 
+          {/* Kita hanya mengirim bus yang sudah difilter ke tabel */}
           <BusTable buses={activeBuses} onRowClick={onBusSelect} />
         </div>
       </div>
@@ -143,7 +148,6 @@ export default function DashboardClient({
         <DriverInfo bus={displayedBus} />
         <BusDetail bus={displayedBus} />
         <BusActivityChart buses={buses} />
-
       </div>
     </div>
   );
