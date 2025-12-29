@@ -181,20 +181,21 @@ export default function MapView({
   // Perbaiki filter status sesuai diskusi sebelumnya
   const activeBuses = buses.filter(
     (b) =>
-      (b.status === 'berjalan' || b.status === 'berhenti') &&
+      b.status === "berjalan" &&
       b.latitude &&
       b.longitude &&
       !isNaN(Number(b.latitude)) &&
       !isNaN(Number(b.longitude))
   );
 
+  // Center map
   const mapCenter: [number, number] =
     activeBuses.length > 0
       ? [
         Number(activeBuses[0].latitude),
         Number(activeBuses[0].longitude),
       ]
-      : [-6.805, 110.84]; // Default UNDIP/Semarang
+      : [-6.805, 110.84]; // default
 
   return (
     <div className="h-full w-full rounded-xl overflow-hidden">
@@ -238,22 +239,21 @@ export default function MapView({
 
         {/* ===== BUS ===== */}
         {activeBuses.map((bus) => {
-          const rotation =
-            rotations.current.get(bus.id_bus) || 0;
+          const rotation = rotations.current.get(bus.id_bus) || 0;
 
           const busIcon = L.divIcon({
             className: "",
             html: `
-              <img 
-                src="/assets/icons/bus.png"
-                style="
-                  width:40px;
-                  height:40px;
-                  transform: rotate(${rotation + 180}deg);
-                  transition: transform 0.5s;
-                "
-              />
-            `,
+        <img 
+          src="/assets/icons/bus.png"
+          style="
+            width:40px;
+            height:40px;
+            transform: rotate(${rotation + 180}deg);
+            transition: transform 0.5s;
+          "
+        />
+      `,
             iconSize: [40, 40],
             iconAnchor: [20, 20],
           });
