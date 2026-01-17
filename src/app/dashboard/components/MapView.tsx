@@ -35,16 +35,7 @@ interface MapViewProps {
   onBusClick: (bus: Bus | null) => void;
 }
 
-// ===== Smooth Map Update =====
-function MapUpdater({ center }: { center: [number, number] | null }) {
-  const map = useMap();
-  useEffect(() => {
-    if (center) map.flyTo(center, 14);
-  }, [center, map]);
-  return null;
-}
-
-// ✅ PERBAIKAN 1: Tambahkan prop 'L' (Leaflet Instance) ke sini
+// ✅ COMPONENT: Hanya Zoom ke Rute saat Rute Berubah
 function FitBoundsToRoute({ polyline, L }: { polyline: [number, number][] | null, L: any }) {
   const map = useMap();
 
@@ -53,10 +44,10 @@ function FitBoundsToRoute({ polyline, L }: { polyline: [number, number][] | null
     if (L && polyline && polyline.length > 0) {
       // Buat bounding box dari koordinat polyline
       const bounds = L.latLngBounds(polyline);
-      // Perintahkan peta untuk zoom agar seluruh rute terlihat
+      // Zoom map pas ke ukuran rute (sekali saja saat polyline berubah)
       map.fitBounds(bounds, { padding: [50, 50] });
     }
-  }, [polyline, map, L]); // Tambahkan L ke dependency array
+  }, [polyline, map, L]); // Dependency hanya polyline, jadi kalau bus gerak map DIAM.
 
   return null;
 }
@@ -122,17 +113,11 @@ export default function MapView({
   // ===== PARSE RUTE DARI BACKEND =====
   useEffect(() => {
     if (selectedRoute?.rute_polyline) {
-      console.log("📍 Data rute diterima:", selectedRoute);
-
       try {
-        // rute_polyline = STRING JSON → PARSE
         const parsed = JSON.parse(selectedRoute.rute_polyline);
-
         const coords: [number, number][] = parsed.map(
           (p: any) => [Number(p[0]), Number(p[1])]
         );
-
-        console.log("✅ Rute berhasil diparse:", coords.length, "titik");
         setDecodedPolyline(coords);
       } catch (e) {
         console.error("❌ Gagal parse rute:", e);
@@ -178,7 +163,6 @@ export default function MapView({
   }
 
   // ===== Bus Valid =====
-  // Perbaiki filter status sesuai diskusi sebelumnya
   const activeBuses = buses.filter(
     (b) =>
       b.status === "berjalan" &&
@@ -188,19 +172,13 @@ export default function MapView({
       !isNaN(Number(b.longitude))
   );
 
-  // Center map
-  const mapCenter: [number, number] =
-    activeBuses.length > 0
-      ? [
-        Number(activeBuses[0].latitude),
-        Number(activeBuses[0].longitude),
-      ]
-      : [-6.805, 110.84]; // default
+  // Default Center (Kudus) - Tidak akan berubah-ubah mengikuti bus
+  const defaultCenter: [number, number] = [-6.805, 110.84];
 
   return (
     <div className="h-full w-full rounded-xl overflow-hidden">
       <MapContainer
-        center={mapCenter}
+        center={defaultCenter}
         zoom={13}
         style={{ height: "100%", width: "100%" }}
       >
@@ -209,7 +187,8 @@ export default function MapView({
           attribution="&copy; OpenStreetMap contributors"
         />
 
-        {/* ✅ PERBAIKAN 2: Oper variable 'L' ke komponen ini */}
+        {/* ✅ INI KUNCINYA: FitBoundsToRoute hanya akan trigger jika 'decodedPolyline' berubah */}
+        {/* 'decodedPolyline' hanya berubah jika 'selectedRoute' berubah */}
         <FitBoundsToRoute polyline={decodedPolyline} L={L} />
 
         {decodedPolyline && (
@@ -281,7 +260,7 @@ export default function MapView({
           );
         })}
 
-        <MapUpdater center={mapCenter} />
+        {/* ❌ SAYA HAPUS <MapUpdater /> AGAR PETA TIDAK MENGIKUTI BUS */}
       </MapContainer>
     </div>
   );

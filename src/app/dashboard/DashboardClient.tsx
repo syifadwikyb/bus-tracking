@@ -5,6 +5,8 @@ import BusTable from './components/BusTable';
 import DriverInfo from './components/DriverInfo';
 import BusDetail from './components/BusDetail';
 import BusActivityChart from './components/BusActivityChart';
+import BusUtilizationChart from './components/BusChart';
+import BusChart from './components/BusChart';
 
 // Tipe Bus
 export type Bus = {
@@ -147,7 +149,8 @@ export default function DashboardClient({
       <div className="flex flex-col gap-6">
         <DriverInfo bus={displayedBus} />
         <BusDetail bus={displayedBus} />
-        <BusActivityChart buses={buses} />
+        {/* <BusActivityChart buses={buses} /> */}
+        <BusChart />
       </div>
     </div>
   );

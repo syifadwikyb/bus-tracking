@@ -36,26 +36,27 @@ export default function BusDetail({ bus }: BusDetailProps) {
     <div className="bg-white p-6 rounded-lg shadow">
       <h3 className="text-xl font-semibold mb-4">Bus Overview</h3>
 
-      {/* Gambar Bus */}
       <div className="flex items-center justify-center bg-gray-50 p-4 rounded-lg mb-4">
-        {bus.foto ? (
+        {bus?.foto ? (
           <Image
             src={
               bus.foto.startsWith("http")
                 ? bus.foto
-                : `${API_URL}${bus.foto}`
+                : `${API_URL}/uploads/${bus.foto}`
             }
             alt="Bus Image"
             width={160}
-            height={300}
+            height={160}
             className="rounded-md object-cover w-40 h-40"
+            priority
           />
         ) : (
-          <div className="w-40 h-24 bg-gray-200 rounded-md flex items-center justify-center text-gray-400 text-sm">
+          <div className="w-40 h-40 bg-gray-200 rounded-md flex items-center justify-center text-gray-400 text-sm">
             No Image
           </div>
         )}
       </div>
+
 
       {/* Detail Bus */}
       <div className="space-y-2">
