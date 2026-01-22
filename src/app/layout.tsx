@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import { Quicksand } from "next/font/google";
 import "./globals.css";
-import Sidebar from "./Sidebar";
+import ClientLayout from "./ClientLayout"; // ✅ Import ClientLayout
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -23,12 +23,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${quicksand.variable} font-sans antialiased`}>
-        <div className="flex h-screen w-full bg-gray-50">
-          <Sidebar />
-          <main className="flex-1 overflow-y-auto">
-            {children}
-          </main>
-        </div>
+        {/* ✅ Gunakan ClientLayout untuk membungkus children */}
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );

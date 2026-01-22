@@ -37,8 +37,8 @@ export default function BusChart() {
   useEffect(() => {
     const end = new Date();
     const start = new Date();
-    start.setDate(end.getDate() - 7); // Default 7 hari
-    
+    start.setDate(end.getDate() - 7);
+
     setEndDate(end.toISOString().split('T')[0]);
     setStartDate(start.toISOString().split('T')[0]);
   }, []);
@@ -59,18 +59,16 @@ export default function BusChart() {
     }
   };
 
-  // Konfigurasi Chart
+
   const data = {
-    labels: chartData.map(d => d.plat_nomor), // Label bawah: Plat Nomor
+    labels: chartData.map(d => d.plat_nomor),
     datasets: [
       {
-        label: 'Durasi Operasional (Menit)',
+        label: 'Durasi (Menit)',
         data: chartData.map(d => d.active_minutes),
         backgroundColor: chartData.map(d => {
-            // Warnai Merah jika pemakaian sangat rendah (< 10 menit) -> Indikasi Jarang Dipakai
-            if (d.active_minutes < 10) return 'rgba(239, 68, 68, 0.7)'; 
-            // Warnai Biru Normal
-            return 'rgba(59, 130, 246, 0.7)';
+          if (d.active_minutes < 10) return 'rgba(239, 68, 68, 0.7)';
+          return 'rgba(59, 130, 246, 0.7)';
         }),
         borderRadius: 4,
       },
@@ -79,74 +77,99 @@ export default function BusChart() {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
-      legend: { position: 'top' as const },
-      title: { 
-        display: true, 
-        text: 'Perbandingan Jam Terbang Bus' 
+      legend: {
+        position: 'top' as const,
+        labels: {
+          boxWidth: 10,
+          font: { size: 12 }
+        }
+      },
+      title: {
+        display: false,
       },
       tooltip: {
         callbacks: {
-            label: (context: any) => {
-                const val = context.raw;
-                return `Aktif: ${val} Menit (~${(val/60).toFixed(1)} Jam)`;
-            }
+          label: (context: any) => {
+            const val = context.raw;
+            return `Aktif: ${val} Menit (~${(val / 60).toFixed(1)} Jam)`;
+          }
         }
       }
     },
     scales: {
-        y: { 
-            beginAtZero: true,
-            title: { display: true, text: 'Menit Aktif' }
+      y: {
+        beginAtZero: true,
+        title: { display: true, text: 'Menit Aktif' },
+        ticks: { maxTicksLimit: 6 }
+      },
+      x: {
+        ticks: {
+          autoSkip: false,
+          maxRotation: 45,
+          minRotation: 45
         }
+      }
     }
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+    <div className="bg-white p-4 md:p-6 rounded-xl shadow-md w-full">
+      {/* Header & Filter Section */}
+      <div className="md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
-            <h3 className="text-lg font-semibold text-gray-800">Utilisasi Armada Bus</h3>
-            <p className="text-sm text-gray-500">Pantau keseimbangan pemakaian armada</p>
+          <h3 className="text-lg font-bold text-gray-800">Utilisasi Armada</h3>
         </div>
-        
-        {/* Filter Tanggal */}
-        <div className="flex items-center gap-2">
-            <input 
-                type="date" 
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="border rounded px-2 py-1 text-sm"
+
+        {/* Filter Tanggal Responsive */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full md:w-auto bg-gray-50 p-2 rounded-lg border border-gray-100">
+          <div className="w-full sm:w-auto">
+            <span className="text-xs text-gray-400 block sm:hidden mb-1">Dari:</span>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="border border-gray-300 rounded px-3 py-2 text-sm w-full md:w-auto focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
             />
-            <span className="text-gray-400">-</span>
-            <input 
-                type="date" 
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="border rounded px-2 py-1 text-sm"
+          </div>
+
+          <span className="hidden sm:block text-gray-400">-</span>
+
+          <div className="w-full sm:w-auto">
+            <span className="text-xs text-gray-400 block sm:hidden mb-1">Sampai:</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="border border-gray-300 rounded px-2 py-1.5 text-sm w-full sm:w-auto focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
+          </div>
         </div>
       </div>
 
-      <div className="h-64 w-full">
+      {/* Chart Container Responsive */}
+      {/* Tinggi 300px di HP, 400px di Tablet/Desktop */}
+      <div className="relative w-full h-[300px] md:h-[400px]">
         {chartData.length > 0 ? (
-            <Bar options={options} data={data} />
+          <Bar options={options} data={data} />
         ) : (
-            <div className="h-full flex items-center justify-center text-gray-400">
-                Memuat data...
-            </div>
+          <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-2">
+            <div className="animate-pulse bg-gray-200 h-8 w-8 rounded-full"></div>
+            <span className="text-sm">Memuat data...</span>
+          </div>
         )}
       </div>
-      
-      {/* Legend Manual untuk info tambahan */}
-      <div className="mt-4 flex gap-4 text-xs text-gray-500 justify-center">
-        <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-blue-500 rounded-sm"></div>
-            <span>Aktif Normal</span>
+
+      {/* Legend Manual */}
+      <div className="mt-6 flex flex-wrap gap-4 text-xs text-gray-600 justify-center bg-gray-50 p-2 rounded-lg">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 bg-blue-500 rounded-sm shadow-sm"></div>
+          <span>Normal</span>
         </div>
-        <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
-            <span>Jarang Digunakan</span>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 bg-red-500 rounded-sm shadow-sm"></div>
+          <span>Jarang Pakai (&lt;10 mnt)</span>
         </div>
       </div>
     </div>

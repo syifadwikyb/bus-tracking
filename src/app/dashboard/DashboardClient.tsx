@@ -4,8 +4,6 @@ import MapView from './components/MapView';
 import BusTable from './components/BusTable';
 import DriverInfo from './components/DriverInfo';
 import BusDetail from './components/BusDetail';
-import BusActivityChart from './components/BusActivityChart';
-import BusUtilizationChart from './components/BusChart';
 import BusChart from './components/BusChart';
 
 // Tipe Bus
