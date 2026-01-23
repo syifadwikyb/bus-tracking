@@ -72,17 +72,17 @@ export default function DashboardClient({
   // Placeholder bus kosong jika belum dipilih
   const emptyBus: Bus = {
     id_bus: 0,
-    kode_bus: "N/A",
-    plat_nomor: "N/A",
-    jenis_bus: "N/A",
-    status: "N/A",
+    kode_bus: "-",
+    plat_nomor: "-",
+    jenis_bus: "-",
+    status: "-",
     latitude: null,
     longitude: null,
     penumpang: 0,
     kapasitas: 0,
-    nama: "N/A",
-    nama_jalur: "N/A",
-    terakhir_dilihat: "N/A",
+    nama: "-",
+    nama_jalur: "-",
+    terakhir_dilihat: "-",
     foto: null,
     driver_foto: null,
     jadwal: []
@@ -147,7 +147,6 @@ export default function DashboardClient({
       <div className="flex flex-col gap-6">
         <DriverInfo bus={displayedBus} />
         <BusDetail bus={displayedBus} />
-        {/* <BusActivityChart buses={buses} /> */}
         <BusChart />
       </div>
     </div>

@@ -29,60 +29,55 @@ export default function BusTable({ buses, onRowClick }: BusTableProps) {
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
               Bus Number
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
               Rute
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
               Driver
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
               Kapasitas
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
               Status
             </th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+
+        <tbody className="divide-y divide-gray-200">
           {runningBuses.length === 0 ? (
             <tr>
               <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
-                Tidak ada bus yang sedang berjalan saat ini.
+                Tidak ada bus berjalan
               </td>
             </tr>
           ) : (
-            runningBuses.map((bus) => {
-
-              return (
-                <tr
-                  key={bus.id_bus}
-                  onClick={() => onRowClick(bus)}
-                  className="hover:bg-gray-50 cursor-pointer"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                    {bus.plat_nomor}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                    {bus.nama_jalur || "N/A"}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                    {bus.nama || "N/A"}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                    {bus.penumpang ?? 0} / {bus.kapasitas}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(bus.status)}`}
-                    >
-                      {bus.status}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })
+            runningBuses.map((bus) => (
+              <tr
+                key={bus.id_bus}
+                onClick={() => onRowClick(bus)} // ✅ KIRIM BUS
+                className="hover:bg-gray-50 cursor-pointer"
+              >
+                <td className="px-6 py-4 font-medium">{bus.plat_nomor}</td>
+                <td className="px-6 py-4">{bus.nama_jalur ?? "N/A"}</td>
+                <td className="px-6 py-4">{bus.nama ?? "N/A"}</td>
+                <td className="px-6 py-4">
+                  {bus.penumpang} / {bus.kapasitas}
+                </td>
+                <td className="px-6 py-4">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${getStatusClass(
+                      bus.status
+                    )}`}
+                  >
+                    {bus.status}
+                  </span>
+                </td>
+              </tr>
+            ))
           )}
         </tbody>
       </table>

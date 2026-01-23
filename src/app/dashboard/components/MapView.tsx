@@ -32,7 +32,7 @@ const Polyline = dynamic(
 interface MapViewProps {
   buses: Bus[];
   selectedRoute: any;
-  onBusClick: (bus: Bus | null) => void;
+  onBusClick: (bus: Bus) => void;
 }
 
 // ✅ COMPONENT: Hanya Zoom ke Rute saat Rute Berubah
@@ -248,6 +248,7 @@ export default function MapView({
               eventHandlers={{
                 click: () => onBusClick(bus),
               }}
+
             >
               <Popup>
                 <b>{bus.kode_bus}</b>

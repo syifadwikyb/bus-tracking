@@ -23,10 +23,15 @@ interface ApiBus {
   kapasitas: number;
   terakhir_dilihat: string | null;
   foto: string | null;
+  nama_jalur?: string; // Jalur dari API response
+  nama?: string; // Nama driver dari API response
+  driver_foto?: string; // Foto driver dari API response
   jadwal: {
+    id_schedule: number;
+    jalur_id: number;
+    driver_id: number;
     status: string;
-    driver: { nama: string, foto: string };
-    jalur: { nama_jalur: string };
+    driver?: { nama: string, foto: string };
   }[];
 }
 
@@ -49,12 +54,31 @@ interface SocketLocationData {
 }
 
 // --- FUNGSI KONVERSI ---
-const convertApiBusToBus = (apiBus: ApiBus): Bus => {
+const convertApiBusToBus = (apiBus: ApiBus, routes: any[] = [], drivers: any[] = []): Bus => {
   const jadwalAktif = apiBus.jadwal?.find(
     (j) => j.status?.toLowerCase() === "berjalan"
   ) || apiBus.jadwal?.[0];
 
-  return {
+  // Cari nama_jalur dari routes berdasarkan jalur_id
+  let nama_jalur: string | null = null;
+  if (jadwalAktif?.jalur_id) {
+    const matchedRoute = routes.find(r => r.id_jalur === jadwalAktif.jalur_id);
+    nama_jalur = matchedRoute?.nama_jalur || null;
+  }
+
+  // Cari nama driver dari drivers berdasarkan driver_id
+  let nama_driver: string | null = null;
+  if (jadwalAktif?.driver_id) {
+    const matchedDriver = drivers.find(d => d.id_driver === jadwalAktif.driver_id);
+    nama_driver = matchedDriver?.nama || null;
+  }
+
+  // Fallback ke API data jika ada
+  const finalNama = apiBus.nama || nama_driver || jadwalAktif?.driver?.nama || null;
+  
+  console.log(`[BUS ${apiBus.kode_bus}] driver_id: ${jadwalAktif?.driver_id}, Matched driver: ${nama_driver}, Final nama: ${finalNama}`);
+
+  const convertedBus: Bus = {
     id_bus: apiBus.id_bus,
     kode_bus: apiBus.kode_bus,
     jenis_bus: apiBus.jenis_bus,
@@ -64,12 +88,14 @@ const convertApiBusToBus = (apiBus: ApiBus): Bus => {
     penumpang: apiBus.penumpang,
     kapasitas: apiBus.kapasitas,
     plat_nomor: apiBus.plat_nomor,
-    nama: jadwalAktif?.driver?.nama || null,
-    nama_jalur: jadwalAktif?.jalur?.nama_jalur || null,
+    nama: finalNama,
+    nama_jalur: apiBus.nama_jalur || nama_jalur || null,
     terakhir_dilihat: apiBus.terakhir_dilihat,
     foto: apiBus.foto,
-    driver_foto: jadwalAktif?.driver?.foto || null
+    driver_foto: apiBus.driver_foto || jadwalAktif?.driver?.foto || null
   };
+  
+  return convertedBus;
 };
 
 // Import Dynamic Dashboard Client
@@ -113,20 +139,22 @@ export default function Page() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [mainDataRes, routesRes] = await Promise.all([
+        const [mainDataRes, routesRes, driversRes] = await Promise.all([
           fetch(`${API_URL}/api/dashboard`),
           fetch(`${API_URL}/api/jalur`),
+          fetch(`${API_URL}/api/drivers`),
         ]);
 
-        if (!mainDataRes.ok || !routesRes.ok) {
+        if (!mainDataRes.ok || !routesRes.ok || !driversRes.ok) {
           throw new Error('Gagal mengambil data awal');
         }
 
         const mainData = await mainDataRes.json();
         const routesData = await routesRes.json();
+        const driversData = await driversRes.json();
 
         const liveBusData: ApiBus[] = mainData.liveBuses;
-        const mappedBuses = liveBusData.map(convertApiBusToBus);
+        const mappedBuses = liveBusData.map(bus => convertApiBusToBus(bus, routesData, driversData));
 
         setBuses(mappedBuses);
         setRoutes(routesData);
