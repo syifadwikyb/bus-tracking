@@ -2,7 +2,8 @@
 import type { Metadata } from "next";
 import { Quicksand } from "next/font/google";
 import "./globals.css";
-import ClientLayout from "./ClientLayout"; // ✅ Import ClientLayout
+import ClientLayout from "./ClientLayout";
+import SessionGuard from "@/components/SessionGuard";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -23,8 +24,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${quicksand.variable} font-sans antialiased`}>
-        {/* ✅ Gunakan ClientLayout untuk membungkus children */}
-        <ClientLayout>{children}</ClientLayout>
+        <SessionGuard>
+          <ClientLayout>
+             {children}
+          </ClientLayout>
+        </SessionGuard>
+
       </body>
     </html>
   );

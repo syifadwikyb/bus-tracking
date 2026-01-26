@@ -1,148 +1,184 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; // ➕ Import Router
+import { useRouter } from 'next/navigation';
 import BusStopRow from './BusStopRow';
 import SearchBar from '@/components/SearchBar';
 import AddButton from '@/components/AddButton';
 import Pagination from '@/components/Pagination';
+import FilterDropdown from '@/components/FilterDropdown'; // ✅ 1. Import FilterDropdown
 import { API_URL } from '@/lib/config';
 
 interface BusStop {
-    id_halte: number;
-    nama_halte: string;
-    latitude: string;
-    longitude: string;
-    jalur?: { nama_jalur: string };
+  id_halte: number;
+  nama_halte: string;
+  latitude: string;
+  longitude: string;
+  jalur?: { nama_jalur: string };
 }
 
 export default function BusStopTable() {
-    const router = useRouter(); // ➕ Init Router
-    const [busStops, setBusStops] = useState<BusStop[]>([]);
-    const [filtered, setFiltered] = useState<BusStop[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [search, setSearch] = useState('');
-    const [page, setPage] = useState(1);
-    const perPage = 7;
+  const router = useRouter();
+  const [busStops, setBusStops] = useState<BusStop[]>([]);
+  const [filtered, setFiltered] = useState<BusStop[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    // Fetch Data
-    const fetchBusStops = async () => {
-        setLoading(true);
-        try {
-            const res = await fetch(`${API_URL}/api/halte`);
-            if (!res.ok) throw new Error('Gagal memuat data halte');
-            const data = await res.json();
-            const list = Array.isArray(data) ? data : (data.data || []);
-            setBusStops(list);
-            setFiltered(list);
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setLoading(false);
-        }
-    };
+  // State Filter
+  const [search, setSearch] = useState('');
+  const [selectedJalur, setSelectedJalur] = useState('');
+  const [availableRoutes, setAvailableRoutes] = useState<string[]>([]);
 
-    useEffect(() => {
-        fetchBusStops();
-    }, []);
+  const [page, setPage] = useState(1);
+  const perPage = 7;
 
-    // Filter
-    useEffect(() => {
-        let result = busStops;
-        if (search) {
-            result = result.filter((halte) =>
-                halte.nama_halte.toLowerCase().includes(search.toLowerCase())
-            );
-        }
-        setFiltered(result);
-        setPage(1);
-    }, [search, busStops]);
+  // Fetch Data
+  const fetchBusStops = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/halte`);
+      if (!res.ok) throw new Error('Gagal memuat data halte');
+      const data = await res.json();
+      const list = Array.isArray(data) ? data : (data.data || []);
 
-    const totalPages = Math.ceil(filtered.length / perPage);
-    const currentData = filtered.slice((page - 1) * perPage, page * perPage);
+      setBusStops(list);
 
-    // --- ➕ LOGIKA NAVIGASI & DELETE ---
+      // Ambil daftar jalur unik untuk opsi filter
+      const routes = Array.from(new Set(
+        list.map((item: BusStop) => item.jalur?.nama_jalur).filter((j: string) => j)
+      )) as string[];
+      setAvailableRoutes(routes.sort());
 
-    const handleShow = (halte: BusStop) => {
-        router.push(`/bus_stop/action_bus_stop?mode=show&id=${halte.id_halte}`);
-    };
+      setFiltered(list);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const handleEdit = (halte: BusStop) => {
-        router.push(`/bus_stop/action_bus_stop?mode=edit&id=${halte.id_halte}`);
-    };
+  useEffect(() => {
+    fetchBusStops();
+  }, []);
 
-    const handleDelete = async (halte: BusStop) => {
-        if (!confirm(`Hapus halte ${halte.nama_halte}?`)) return;
+  // Filter Logic
+  useEffect(() => {
+    let result = busStops;
 
-        try {
-            const res = await fetch(`${API_URL}/api/halte/${halte.id_halte}`, {
-                method: "DELETE",
-            });
+    if (search) {
+      result = result.filter((halte) =>
+        halte.nama_halte.toLowerCase().includes(search.toLowerCase())
+      );
+    }
 
-            if (!res.ok) throw new Error("Gagal menghapus halte");
+    if (selectedJalur) {
+      result = result.filter((halte) =>
+        halte.jalur?.nama_jalur === selectedJalur
+      );
+    }
 
-            alert("✅ Halte berhasil dihapus");
-            fetchBusStops(); // Refresh data
-        } catch (error) {
-            console.error(error);
-            alert("❌ Gagal menghapus halte.");
-        }
-    };
+    setFiltered(result);
+    setPage(1);
+  }, [search, selectedJalur, busStops]);
 
-    return (
-        <div className="bg-white rounded-lg shadow-lg">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4 border-b">
-                <SearchBar
-                    value={search}
-                    onChange={setSearch}
-                    onClear={() => setSearch('')}
-                    onSubmit={(e) => e.preventDefault()}
-                />
-                <AddButton route="/bus_stop/action_bus_stop" />
-            </div>
+  const totalPages = Math.ceil(filtered.length / perPage);
+  const currentData = filtered.slice((page - 1) * perPage, page * perPage);
 
-            <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Nama Halte</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Latitude</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Longitude</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Jalur</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {loading ? (
-                            <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">Memuat data...</td></tr>
-                        ) : currentData.length > 0 ? (
-                            currentData.map((halte) => (
-                                <BusStopRow
-                                    key={halte.id_halte}
-                                    halte={halte}
-                                    onShow={handleShow}
-                                    onEdit={handleEdit}
-                                    onDelete={handleDelete}
-                                />
-                            ))
-                        ) : (
-                            <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">Tidak ada data halte.</td></tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+  const handleShow = (halte: BusStop) => {
+    router.push(`/bus_stop/action_bus_stop?mode=show&id=${halte.id_halte}`);
+  };
 
-            {totalPages > 1 && (
-                <div className="px-6 py-3 border-t">
-                    <Pagination
-                        currentPage={page}
-                        totalPages={totalPages}
-                        onPrev={() => setPage((p) => Math.max(p - 1, 1))}
-                        onNext={() => setPage((p) => Math.min(p + 1, totalPages))}
-                        onPageSelect={setPage}
-                    />
-                </div>
-            )}
+  const handleEdit = (halte: BusStop) => {
+    router.push(`/bus_stop/action_bus_stop?mode=edit&id=${halte.id_halte}`);
+  };
+
+  const handleDelete = async (halte: BusStop) => {
+    if (!confirm(`Hapus halte ${halte.nama_halte}?`)) return;
+
+    try {
+      const res = await fetch(`${API_URL}/api/halte/${halte.id_halte}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) throw new Error("Gagal menghapus halte");
+
+      alert("✅ Halte berhasil dihapus");
+      fetchBusStops();
+    } catch (error) {
+      console.error(error);
+      alert("❌ Gagal menghapus halte.");
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-lg">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4">
+        {/* Search Bar di Kiri */}
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+          onClear={() => setSearch('')}
+          onSubmit={(e) => e.preventDefault()}
+        />
+
+        {/* ✅ 2. Group Button & Filter di Kanan (Sesuai DriverTable) */}
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <AddButton route="/bus_stop/action_bus_stop" />
+          
+          <FilterDropdown
+            filters={[
+              {
+                label: 'Jalur',
+                options: availableRoutes, // Menggunakan jalur dinamis dari API
+                value: selectedJalur,
+                onChange: setSelectedJalur
+              }
+            ]}
+          />
         </div>
-    );
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="text-center min-w-full divide-y divide-blue-200">
+          <thead className="bg-blue-50">
+            <tr>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Nama Halte</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Latitude</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Longitude</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Jalur</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Aksi</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {loading ? (
+              <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">Memuat data...</td></tr>
+            ) : currentData.length > 0 ? (
+              currentData.map((halte) => (
+                <BusStopRow
+                  key={halte.id_halte}
+                  halte={halte}
+                  onShow={handleShow}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              ))
+            ) : (
+              <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">Tidak ada data halte ditemukan.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {totalPages > 1 && (
+        <div className="px-6 py-3">
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPrev={() => setPage((p) => Math.max(p - 1, 1))}
+            onNext={() => setPage((p) => Math.min(p + 1, totalPages))}
+            onPageSelect={setPage}
+          />
+        </div>
+      )}
+    </div>
+  );
 }

@@ -117,10 +117,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                         {/* Tambahkan onClose ke setiap NavLink agar menu nutup pas diklik di HP */}
                         <NavLink href="/dashboard" icon={LayoutDashboard} onClick={onClose}>Dasbor</NavLink>
                         <NavLink href="/bus" icon={Bus} onClick={onClose}>Bus</NavLink>
-                        <NavLink href="/bus_stop" icon={MapPin} onClick={onClose}>Halte</NavLink>
                         <NavLink href="/schedule" icon={CalendarDays} onClick={onClose}>Penjadwalan</NavLink>
-                        <NavLink href="/route" icon={Map} onClick={onClose}>Rute</NavLink>
                         <NavLink href="/drivers" icon={Users} onClick={onClose}>Sopir</NavLink>
+                        <NavLink href="/route" icon={Map} onClick={onClose}>Rute</NavLink>
+                        <NavLink href="/bus_stop" icon={MapPin} onClick={onClose}>Halte</NavLink>
                         <NavLink href="/maintenance" icon={Wrench} onClick={onClose}>Perawatan</NavLink>
                     </nav>
                 </div>

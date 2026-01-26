@@ -23,9 +23,9 @@ interface ApiBus {
   kapasitas: number;
   terakhir_dilihat: string | null;
   foto: string | null;
-  nama_jalur?: string; // Jalur dari API response
-  nama?: string; // Nama driver dari API response
-  driver_foto?: string; // Foto driver dari API response
+  nama_jalur?: string;
+  nama?: string;
+  driver_foto?: string;
   jadwal: {
     id_schedule: number;
     jalur_id: number;
@@ -261,25 +261,25 @@ export default function Page() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
         <StatsCard
-          title="Running"
+          title="Berjalan"
           count={stats?.active ?? 0}
           icon={<BusFront className="h-6 w-6" />}
           color="bg-gradient-to-r from-purple-500 to-indigo-600"
         />
         <StatsCard
-          title="Scheduled"
+          title="Dijadwalkan"
           count={stats?.scheduled ?? 0}
           icon={<CalendarClock className="h-6 w-6" />}
           color="bg-gradient-to-r from-blue-400 to-cyan-500"
         />
         <StatsCard
-          title="Stopped"
+          title="Berhenti"
           count={stats?.nonActive ?? 0}
           icon={<CircleOff className="h-6 w-6" />}
           color="bg-gradient-to-r from-orange-400 to-red-500"
         />
         <StatsCard
-          title="Maintenance"
+          title="Perbaikan"
           count={stats?.maintenance ?? 0}
           icon={<Wrench className="h-6 w-6" />}
           color="bg-gradient-to-r from-gray-700 to-gray-900"

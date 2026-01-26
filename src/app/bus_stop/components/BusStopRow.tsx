@@ -34,7 +34,7 @@ export default function BusStopRow({ halte, onShow, onEdit, onDelete }: BusStopR
                 {halte.jalur?.nama_jalur || '—'}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <div className="flex items-center space-x-2">
+                <div className="flex justify-center items-center space-x-2">
                     <ActionButton
                         color="green"
                         icon={<Eye size={16} />}

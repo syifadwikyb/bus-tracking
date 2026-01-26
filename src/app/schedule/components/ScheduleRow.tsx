@@ -88,7 +88,7 @@ export default function ScheduleRow({
         <StatusBadge status={schedule.status} />
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-center space-x-2">
           <ActionButton
             color="green"
             icon={<Eye size={16} />}

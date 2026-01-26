@@ -43,7 +43,7 @@ const StatusBadge = ({ status }: { status: Bus['status'] }) => {
     } else {
         // Default ke Berhenti untuk semua status lain
         statusText = 'Berhenti'; // Stopped
-        statusClass = 'bg-gray-100 text-gray-600 border border-gray-200';
+        statusClass = 'bg-red-100 text-red-600 border border-red-200';
     }
 
     return (
@@ -71,7 +71,7 @@ export default function BusRow({ bus, onShow, onEdit, onDelete }: BusRowProps) {
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 {/* Tombol Aksi */}
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 justify-center">
                     <ActionButton
                         color="green"
                         icon={<Eye size={16} />}

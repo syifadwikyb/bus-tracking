@@ -107,7 +107,7 @@ export default function MaintenanceRow({
                 <StatusBadge status={maintenance.status} />
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <div className="flex items-center space-x-2">
+                <div className="flex justify-center items-center space-x-2">
                     <ActionButton
                         color="green"
                         icon={<Eye size={16} />}

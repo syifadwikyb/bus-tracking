@@ -48,7 +48,6 @@ export default function DashboardClient({
   routes,
   selectedBus,
   onBusSelect,
-  stats,
   loading,
   selectedRoute,
   onRouteSelect
@@ -119,9 +118,6 @@ export default function DashboardClient({
           </div>
 
           <div className="h-[400px] w-full rounded-lg overflow-hidden border border-gray-200">
-            {/* ✅ PENTING: Kita kirim 'buses' (semua data) ke MapView. 
-               Pastikan di dalam file MapView.tsx logic filternya BENAR.
-            */}
             <MapView
               buses={buses}
               selectedRoute={selectedRoute}

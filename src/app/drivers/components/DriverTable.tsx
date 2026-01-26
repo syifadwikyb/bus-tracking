@@ -101,10 +101,9 @@ export default function DriverTable() {
 
   return (
     <div className="bg-white rounded-lg shadow-lg">
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4 border-b">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4">
         <SearchBar value={search} onChange={setSearch} onClear={() => setSearch('')} onSubmit={(e) => e.preventDefault()} />
-        <div className="flex items-center gap-2">
-          {/* 👇 Update Route ke action_driver */}
+        <div className="flex items-center gap-2">          
           <AddButton route="/drivers/action_driver" />
           <FilterDropdown
             filters={[{ label: 'Status', options: ['berjalan', 'berhenti', 'dijadwalkan'], value: filterStatus, onChange: setFilterStatus }]}
@@ -113,14 +112,14 @@ export default function DriverTable() {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="text-center min-w-full divide-y divide-blue-200">
+          <thead className="bg-blue-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Nama</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Tanggal Lahir</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">No. Telepon</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Action</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Nama</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Tanggal Lahir</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">No. Telepon</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Status</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Action</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -144,7 +143,7 @@ export default function DriverTable() {
       </div>
 
       {totalPages > 1 && (
-        <div className="px-6 py-3 border-t">
+        <div className="px-6 py-3">
           <Pagination currentPage={currentPage} totalPages={totalPages} onPrev={() => setCurrentPage((p) => Math.max(p - 1, 1))} onNext={() => setCurrentPage((p) => Math.min(p + 1, totalPages))} onPageSelect={setCurrentPage} />
         </div>
       )}

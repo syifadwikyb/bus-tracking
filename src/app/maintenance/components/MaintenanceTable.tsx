@@ -150,7 +150,7 @@ export default function MaintenanceTable() {
     // 4. Kita tidak perlu Fragment <> lagi
     <div className="bg-white rounded-lg shadow-lg">
       {/* Toolbar (tetap sama) */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4 border-b">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4">
         <SearchBar
           value={search}
           onChange={setSearch}
@@ -174,16 +174,16 @@ export default function MaintenanceTable() {
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="text-center min-w-full divide-y divide-blue-200">
+          <thead className="bg-blue-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Bus</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tanggal Perbaikan</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tanggal Selesai</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Deskripsi</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Harga</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase tracking-wider">Bus</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase tracking-wider">Tanggal Perbaikan</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase tracking-wider">Tanggal Selesai</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase tracking-wider">Deskripsi</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase tracking-wider">Harga</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase tracking-wider">Action</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -208,7 +208,7 @@ export default function MaintenanceTable() {
 
       {/* Pagination (tetap sama) */}
       {totalPages > 1 && (
-        <div className="px-6 py-3 border-t">
+        <div className="px-6 py-3">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -219,7 +219,5 @@ export default function MaintenanceTable() {
         </div>
       )}
     </div>
-
-    // 5. Komponen <ConfirmationModal> dihapus dari sini
   );
 }
