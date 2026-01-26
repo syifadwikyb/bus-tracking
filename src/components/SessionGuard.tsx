@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
-const TIMEOUT_MS = 5 * 60 * 1000; // 5 menit
+const TIMEOUT_MS = 15 * 60 * 1000; // 5 menit
 
 export default function SessionGuard({
   children,
