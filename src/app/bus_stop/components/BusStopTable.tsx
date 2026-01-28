@@ -6,7 +6,7 @@ import BusStopRow from './BusStopRow';
 import SearchBar from '@/components/SearchBar';
 import AddButton from '@/components/AddButton';
 import Pagination from '@/components/Pagination';
-import FilterDropdown from '@/components/FilterDropdown'; // ✅ 1. Import FilterDropdown
+import FilterDropdown from '@/components/FilterDropdown';
 import { API_URL } from '@/lib/config';
 
 interface BusStop {

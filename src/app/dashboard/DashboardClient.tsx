@@ -1,12 +1,12 @@
 'use client';
 
+import { useMemo } from 'react'; // Import useMemo
 import MapView from './components/MapView';
 import BusTable from './components/BusTable';
 import DriverInfo from './components/DriverInfo';
 import BusDetail from './components/BusDetail';
 import BusChart from './components/BusChart';
 
-// Tipe Bus
 export type Bus = {
   id_bus: number;
   kode_bus: string;
@@ -22,7 +22,9 @@ export type Bus = {
   terakhir_dilihat: string | null;
   foto: string | null;
   driver_foto: string | null;
-  jadwal?: any[];
+  eta_seconds?: number;
+  distance_to_next_halte?: number;
+  next_halte_id?: number;
 };
 
 export interface Stats {
@@ -61,54 +63,39 @@ export default function DashboardClient({
     );
   }
 
-  const activeBuses = buses.filter((bus) => {
-    const status = bus.status?.toLowerCase();
-    const hasCoords = bus.latitude && bus.longitude;
+  const activeBuses = useMemo(() => {
+    return buses.filter((bus) => {
+      const status = bus.status?.toLowerCase();
+      return status === 'berjalan' && bus.latitude && bus.longitude;
+    });
+  }, [buses]);
 
-    return status === 'berjalan' && hasCoords;
-  });
-
-  // Placeholder bus kosong jika belum dipilih
   const emptyBus: Bus = {
-    id_bus: 0,
-    kode_bus: "-",
-    plat_nomor: "-",
-    jenis_bus: "-",
-    status: "-",
-    latitude: null,
-    longitude: null,
-    penumpang: 0,
-    kapasitas: 0,
-    nama: "-",
-    nama_jalur: "-",
-    terakhir_dilihat: "-",
-    foto: null,
-    driver_foto: null,
-    jadwal: []
+    id_bus: 0, kode_bus: "-", plat_nomor: "-", jenis_bus: "-", status: "-",
+    latitude: null, longitude: null, penumpang: 0, kapasitas: 0,
+    nama: "-", nama_jalur: "-", terakhir_dilihat: "-", foto: null, driver_foto: null
   };
 
   const displayedBus = selectedBus ?? emptyBus;
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-
-      {/* Bagian Kiri */}
       <div className="lg:col-span-2 flex flex-col gap-6">
-
-        {/* MAP */}
-        <div className="bg-white rounded-lg shadow-md p-4">
+        
+        {/* MAP SECTION */}
+        <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">Peta Tracking Bus</h3>
-
+            <h3 className="text-lg font-semibold text-gray-800">Peta Tracking Real-time</h3>
+            
             <select
               onChange={(e) => {
                 const routeId = e.target.value ? parseInt(e.target.value) : null;
                 const routeSummary = routes.find(r => r.id_jalur === routeId);
                 onRouteSelect(routeSummary || null);
               }}
-              className="px-3 py-1 border border-gray-300 rounded-md text-sm"
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
             >
-              <option value="">Pilih Rute</option>
+              <option value="">Semua Rute</option>
               {routes.map(route => (
                 <option key={route.id_jalur} value={route.id_jalur}>
                   {route.nama_jalur}
@@ -117,7 +104,7 @@ export default function DashboardClient({
             </select>
           </div>
 
-          <div className="h-[400px] w-full rounded-lg overflow-hidden border border-gray-200">
+          <div className="h-[450px] w-full rounded-lg overflow-hidden border border-gray-200 relative z-0">
             <MapView
               buses={buses}
               selectedRoute={selectedRoute}
@@ -126,24 +113,22 @@ export default function DashboardClient({
           </div>
         </div>
 
-        {/* Tabel Bus Aktif */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-200">
-            <h3 className="text-lg font-semibold">
-              Bus Aktif ({activeBuses.length})
+        {/* TABLE SECTION */}
+        <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
+          <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+            <h3 className="text-lg font-semibold text-gray-700">
+              Armada Beroperasi ({activeBuses.length})
             </h3>
           </div>
-
-          {/* Kita hanya mengirim bus yang sudah difilter ke tabel */}
           <BusTable buses={activeBuses} onRowClick={onBusSelect} />
         </div>
       </div>
 
-      {/* Bagian Kanan */}
+      {/* DETAIL & CHART */}
       <div className="flex flex-col gap-6">
         <DriverInfo bus={displayedBus} />
         <BusDetail bus={displayedBus} />
-        <BusChart />
+        <BusChart /> 
       </div>
     </div>
   );
