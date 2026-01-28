@@ -186,9 +186,6 @@ export default function MapView({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
         />
-
-        {/* ✅ INI KUNCINYA: FitBoundsToRoute hanya akan trigger jika 'decodedPolyline' berubah */}
-        {/* 'decodedPolyline' hanya berubah jika 'selectedRoute' berubah */}
         <FitBoundsToRoute polyline={decodedPolyline} L={L} />
 
         {decodedPolyline && (
@@ -260,8 +257,6 @@ export default function MapView({
             </Marker>
           );
         })}
-
-        {/* ❌ SAYA HAPUS <MapUpdater /> AGAR PETA TIDAK MENGIKUTI BUS */}
       </MapContainer>
     </div>
   );
