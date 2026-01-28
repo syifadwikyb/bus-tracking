@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Sidebar from "./Sidebar"; // Pastikan path benar
+import Sidebar from "./Sidebar"; 
 
 export default function ClientLayout({
   children,
@@ -12,13 +12,14 @@ export default function ClientLayout({
   const pathname = usePathname();
   const router = useRouter();
   
-  // 1. State untuk Loading Auth
   const [isLoading, setIsLoading] = useState(true);
-  
-  // 2. State untuk Buka/Tutup Sidebar di Mobile
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
+    // ⚠️ [MODE TESTING PERFORMA - BYPASS AKTIF]
+    // Kita matikan pengecekan token di sini agar bisa masuk tanpa login
+
+    /* --- KODE ASLI (DI-KOMENTAR) ---
     const token = localStorage.getItem("token");
     const isAuthPage = pathname.startsWith("/auth");
 
@@ -29,6 +30,12 @@ export default function ClientLayout({
     } else {
       setIsLoading(false);
     }
+    ---------------------------------- */
+
+    // GANTI JADI INI:
+    // Langsung set loading selesai agar konten muncul
+    setIsLoading(false); 
+
   }, [pathname, router]);
 
   // Tutup sidebar otomatis saat pindah halaman (UX Mobile)
@@ -47,54 +54,13 @@ export default function ClientLayout({
 
   return (
     <div className="flex h-screen w-full bg-gray-50 overflow-hidden">
-      
-      {/* ✅ SIDEBAR 
-        Kita oper props:
-        - isOpen: status dari state
-        - onClose: fungsi untuk mengubah state jadi false
-      */}
       <Sidebar 
         isOpen={isSidebarOpen} 
         onClose={() => setIsSidebarOpen(false)} 
       />
 
-      {/* KONTEN UTAMA */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
-        <div className="flex-1 overflow-y-auto p-4 md:p-8">
-            
-            {/* ✅ HEADER
-              Jika Header ada di sini (Global), pasang props onMenuClick.
-              Jika Header Anda ada di dalam masing-masing page.tsx (Dashboard, Bus, dll),
-              Anda perlu cara lain (seperti Zustand) atau oper setter ke children.
-              
-              UNTUK KEMUDAHAN SEKARANG:
-              Saya asumsikan Header ada di dalam masing-masing Page.
-              Agar tombol hamburger di Header berfungsi, kita perlu trick sedikit 
-              atau memindahkan Header ke Layout ini.
-            */}
-            
-            {/* OPSI TERBAIK: Pindahkan <Header /> ke sini (Layout) agar muncul di semua halaman 
-               dan gampang connect ke Sidebar.
-            */}
-            
-            {/* <Header 
-                  title="Judul Halaman" 
-                  subtitle="Subjudul" 
-                  onMenuClick={() => setIsSidebarOpen(true)} 
-                /> 
-            */}
-
-            {/* Render Halaman (Dashboard, Bus, dll) */}
-            {/* KITA PERLU MENGIRIM FUNGSI BUKA SIDEBAR KE BAWAH
-               Cara termudah tanpa library tambahan adalah mempassing props ke children 
-               (tapi di Next.js children itu opaque).
-               
-               JADI: Kita buat tombol hamburger "Global" di pojok kiri atas (khusus mobile)
-               jika Header Anda tersebar di banyak file.
-            */}
-            
-            {/* Tombol Hamburger Cadangan (Floating Button Mobile Only) */}
-            {/* Muncul hanya jika belum ada Header global */}
+        <div className="flex-1 overflow-y-auto p-4 md:p-8">          
             <button
                 onClick={() => setIsSidebarOpen(true)}
                 className="md:hidden fixed top-4 left-4 z-30 p-2 bg-blue-600 text-white rounded-lg shadow-lg"
