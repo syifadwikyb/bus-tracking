@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Sidebar from "./Sidebar"; 
+import Sidebar from "./Sidebar"; // Pastikan path benar
 
 export default function ClientLayout({
   children,
@@ -12,14 +12,13 @@ export default function ClientLayout({
   const pathname = usePathname();
   const router = useRouter();
   
+  // 1. State untuk Loading Auth
   const [isLoading, setIsLoading] = useState(true);
+  
+  // 2. State untuk Buka/Tutup Sidebar di Mobile
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
-    // ⚠️ [MODE TESTING PERFORMA - BYPASS AKTIF]
-    // Kita matikan pengecekan token di sini agar bisa masuk tanpa login
-
-    /* --- KODE ASLI (DI-KOMENTAR) ---
     const token = localStorage.getItem("token");
     const isAuthPage = pathname.startsWith("/auth");
 
@@ -30,12 +29,6 @@ export default function ClientLayout({
     } else {
       setIsLoading(false);
     }
-    ---------------------------------- */
-
-    // GANTI JADI INI:
-    // Langsung set loading selesai agar konten muncul
-    setIsLoading(false); 
-
   }, [pathname, router]);
 
   // Tutup sidebar otomatis saat pindah halaman (UX Mobile)
@@ -54,11 +47,13 @@ export default function ClientLayout({
 
   return (
     <div className="flex h-screen w-full bg-gray-50 overflow-hidden">
+      
       <Sidebar 
         isOpen={isSidebarOpen} 
         onClose={() => setIsSidebarOpen(false)} 
       />
 
+      {/* KONTEN UTAMA */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
         <div className="flex-1 overflow-y-auto p-4 md:p-8">          
             <button
