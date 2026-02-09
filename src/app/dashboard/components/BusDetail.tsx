@@ -9,11 +9,10 @@ type BusDetailProps = {
   bus: Bus | null;
 };
 
-// Komponen baris detail agar kodingan lebih rapi
 const DetailRow = ({
   label,
   value,
-  isStatus = false, // Opsi untuk styling khusus status
+  isStatus = false,
 }: {
   label: string;
   value: string | number | null | undefined;
@@ -74,7 +73,7 @@ export default function BusDetail({ bus }: BusDetailProps) {
               alt={`Bus ${bus.plat_nomor}`}
               fill
               className="object-cover"
-              onError={() => setImgSrc("/assets/icons/bus-placeholder.svg")} // Fallback jika gambar rusak
+              onError={() => setImgSrc("/assets/icons/bus-placeholder.svg")}
               sizes="(max-width: 768px) 100vw, 300px"
               priority
             />

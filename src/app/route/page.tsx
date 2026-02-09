@@ -1,7 +1,6 @@
 import Header from '@/components/Header';
 import RouteTable from './components/RouteTable';
 
-// Ini adalah halaman utama untuk '/bus_stop/route'
 export default function RouteManagementPage() {
   const getGreeting = () => {
     const hour = new Date().getHours();

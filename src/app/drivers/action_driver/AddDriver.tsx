@@ -140,7 +140,7 @@ export default function AddDriver() {
                                     <img src={fotoPreview} alt="Preview" className="w-32 h-32 object-cover rounded-full shadow-md border-4 border-white" />
                                 ) : (
                                     <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center text-gray-400 shadow-inner">
-                                        <span className="text-4xl">👤</span>
+                                        <span className="text-4xl"></span>
                                     </div>
                                 )}
                             </div>

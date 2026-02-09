@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; // ➕ Import Router
+import { useRouter } from 'next/navigation';
 import DriverRow from './DriverRow';
 import SearchBar from '@/components/SearchBar';
 import AddButton from '@/components/AddButton';
@@ -69,11 +69,11 @@ export default function DriverTable() {
 
   // --- NAVIGASI ACTION ---
   const handleShow = (driver: Driver) => {
-    router.push(`/driver/action_driver?mode=show&id=${driver.id_driver}`);
+    router.push(`/drivers/action_driver?mode=show&id=${driver.id_driver}`);
   };
 
   const handleEdit = (driver: Driver) => {
-    router.push(`/driver/action_driver?mode=edit&id=${driver.id_driver}`);
+    router.push(`/drivers/action_driver?mode=edit&id=${driver.id_driver}`);
   };
 
   // --- DELETE FUNCTION ---

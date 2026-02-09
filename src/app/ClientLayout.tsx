@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Sidebar from "./Sidebar"; // Pastikan path benar
+import Sidebar from "./Sidebar";
 
 export default function ClientLayout({
   children,
