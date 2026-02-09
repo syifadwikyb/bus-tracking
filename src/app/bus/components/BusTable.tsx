@@ -142,7 +142,7 @@ export default function BusTable() {
                             <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Jenis Bus</th>
                             <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Kapasitas</th>
                             <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Status</th>
-                            <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Action</th>
+                            <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Aksi</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">

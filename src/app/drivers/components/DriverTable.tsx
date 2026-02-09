@@ -119,7 +119,7 @@ export default function DriverTable() {
               <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Tanggal Lahir</th>
               <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">No. Telepon</th>
               <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Status</th>
-              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Action</th>
+              <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Aksi</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">

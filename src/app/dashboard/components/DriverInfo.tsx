@@ -28,9 +28,6 @@ export default function DriverInfo({ bus }: DriverInfoProps) {
         ? fotoDriver
         : `${API_URL}/uploads/${fotoDriver}`;
 
-      // 👇 TAMBAHKAN INI UNTUK MENGECEK
-      console.log("👉 URL FOTO DRIVER:", url);
-
       setImgSrc(url);
     } else {
       setImgSrc("/assets/icons/Profile.svg");

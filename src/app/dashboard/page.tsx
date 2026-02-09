@@ -75,8 +75,6 @@ const convertApiBusToBus = (apiBus: ApiBus, routes: any[] = [], drivers: any[] =
 
   // Fallback ke API data jika ada
   const finalNama = apiBus.nama || nama_driver || jadwalAktif?.driver?.nama || null;
-  
-  console.log(`[BUS ${apiBus.kode_bus}] driver_id: ${jadwalAktif?.driver_id}, Matched driver: ${nama_driver}, Final nama: ${finalNama}`);
 
   const convertedBus: Bus = {
     id_bus: apiBus.id_bus,

@@ -37,7 +37,7 @@ export default function FilterDropdown({ filters }: FilterDropdownProps) {
                     onClick={(e) => e.stopPropagation()} // Mencegah penutupan saat diklik
                 >
                     <div className="p-4 border-b">
-                        <h3 className="text-lg font-semibold text-gray-900">Filter Options</h3>
+                        <h3 className="text-lg font-semibold text-gray-900">Filter</h3>
                     </div>
 
                     <form className="p-4 space-y-4">
