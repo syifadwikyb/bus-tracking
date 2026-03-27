@@ -25,6 +25,7 @@ export type Bus = {
   eta_seconds?: number;
   distance_to_next_halte?: number;
   next_halte_id?: number;
+  daftar_eta?: any[];
 };
 
 export interface Stats {

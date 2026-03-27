@@ -50,7 +50,8 @@ interface SocketLocationData {
   longitude: number;
   speed: number;
   status: string;
-  passenger_count?: number; // Tambahan untuk data penumpang
+  passenger_count?: number;
+  daftar_eta?: any[];
 }
 
 // --- FUNGSI KONVERSI ---
@@ -192,7 +193,8 @@ export default function Page() {
               // ✅ Update Penumpang (Jika dikirim backend, jika tidak pakai data lama)
               penumpang: (data.passenger_count !== undefined)
                 ? data.passenger_count
-                : bus.penumpang
+                : bus.penumpang,
+              daftar_eta: data.daftar_eta || bus.daftar_eta || []
             };
           }
           return bus;
@@ -210,7 +212,8 @@ export default function Page() {
             terakhir_dilihat: new Date().toISOString(),
             penumpang: (data.passenger_count !== undefined)
               ? data.passenger_count
-              : prev.penumpang
+              : prev.penumpang,
+            daftar_eta: data.daftar_eta || prev.daftar_eta || []
           };
         }
         return prev;
