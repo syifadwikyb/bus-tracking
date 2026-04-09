@@ -91,7 +91,7 @@ export default function RegisterPage() {
                     </h2>
                     <p className="text-blue-100 text-lg">
                         Solusi manajemen transportasi cerdas untuk efisiensi jadwal, pemantauan rute, dan keselamatan penumpang.
-                    </p>                    
+                    </p>            
                 </div>
 
                 <div className="relative z-10 text-blue-200 text-sm">
