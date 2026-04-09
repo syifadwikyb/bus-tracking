@@ -82,19 +82,7 @@ export default function LoginPage() {
                     </h2>
                     <p className="text-blue-100 text-lg">
                         Solusi manajemen transportasi cerdas untuk efisiensi jadwal, pemantauan rute, dan keselamatan penumpang.
-                    </p>
-
-                    {/* Fitur Highlights Kecil */}
-                    <div className="flex gap-4 mt-8 pt-8 border-t border-blue-400/30">
-                        <div className="flex items-center gap-2">
-                            <MapPin className="h-5 w-5 text-blue-200" />
-                            <span className="text-sm font-medium">Live GPS</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="h-2 w-2 rounded-full bg-green-400"></div>
-                            <span className="text-sm font-medium">99.9% Uptime</span>
-                        </div>
-                    </div>
+                    </p>                    
                 </div>
 
                 <div className="relative z-10 text-blue-200 text-sm">
