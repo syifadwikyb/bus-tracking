@@ -69,9 +69,11 @@ const convertApiBusToBus = (apiBus: ApiBus, routes: any[] = [], drivers: any[] =
 
   // Cari nama driver dari drivers berdasarkan driver_id
   let nama_driver: string | null = null;
+  let driver_foto: string | null = null;
   if (jadwalAktif?.driver_id) {
     const matchedDriver = drivers.find(d => d.id_driver === jadwalAktif.driver_id);
     nama_driver = matchedDriver?.nama || null;
+    driver_foto = matchedDriver?.driver_foto || null;
   }
 
   // Fallback ke API data jika ada
@@ -91,7 +93,7 @@ const convertApiBusToBus = (apiBus: ApiBus, routes: any[] = [], drivers: any[] =
     nama_jalur: apiBus.nama_jalur || nama_jalur || null,
     terakhir_dilihat: apiBus.terakhir_dilihat,
     foto: apiBus.foto,
-    driver_foto: apiBus.driver_foto || jadwalAktif?.driver?.driver_foto || null
+    driver_foto: apiBus.driver_foto || jadwalAktif?.driver?.driver_foto || driver_foto || null
   };
   
   return convertedBus;
