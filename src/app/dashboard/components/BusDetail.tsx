@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import { type Bus } from "../DashboardClient"; // Sesuaikan path ini jika berbeda
 import { API_URL } from '@/lib/config';
@@ -37,20 +36,21 @@ export default function BusDetail({ bus }: BusDetailProps) {
   const [imgSrc, setImgSrc] = useState("/assets/icons/bus.svg");
 
   useEffect(() => {
-    // TAMBAHKAN LOG INI UNTUK DEBUGGING
-    console.log("Data Bus dari Dashboard:", bus);
-    
-    if (bus?.foto) {
-      const url = bus.foto.startsWith("http") ? bus.foto : `${API_URL}/uploads/${bus.foto}`;
-      
-      // TAMBAHKAN LOG INI JUGA
-      console.log("URL Gambar Final:", url);
-      
+    if (!bus) {
+      setImgSrc("/assets/icons/bus.svg");
+      return;
+    }
+
+    const imageName = bus.foto || bus.driver_foto;
+    if (imageName) {
+      const url = String(imageName).startsWith("http")
+        ? String(imageName)
+        : `${API_URL}/uploads/${imageName}`;
       setImgSrc(url);
     } else {
       setImgSrc("/assets/icons/bus.svg");
     }
-  }, [bus]);  
+  }, [bus]);
 
   // Tampilan Placeholder Jika Bus Belum Dipilih
   if (!bus || bus.id_bus === 0) {
@@ -73,14 +73,13 @@ export default function BusDetail({ bus }: BusDetailProps) {
       <h3 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Detail Bus</h3>
       
       <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden mb-6 border border-gray-200">
-        <Image
+        <img
           src={imgSrc}
           alt={`Bus ${bus.plat_nomor}`}
-          fill
-          className="object-cover"
-          onError={() => setImgSrc("/assets/icons/bus.svg")}
-          sizes="(max-width: 768px) 100vw, 300px"
-          priority
+          className="w-full h-full object-cover"
+          onError={(event) => {
+            event.currentTarget.src = "/assets/icons/bus.svg";
+          }}
         />
       </div>
 
