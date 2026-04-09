@@ -1,7 +1,5 @@
 "use client";
 
-import Image from 'next/image';
-import { useState, useEffect } from 'react';
 import { API_URL } from '@/lib/config';
 
 interface DriverInfoProps {
@@ -9,42 +7,33 @@ interface DriverInfoProps {
 }
 
 export default function DriverInfo({ bus }: DriverInfoProps) {
-  // 1. AMBIL NAMA
-  // Kita pakai prioritas: Cek 'nama_driver' dulu (standar backend kita),
-  // kalau tidak ada baru cek 'nama'.
-  const nama = bus?.nama_driver || bus?.nama || '-';
-
+  // const nama = bus?.nama_driver || bus?.nama || '-';
+  const nama = bus?.nama_driver ||
+    bus?.nama ||
+    bus?.jadwal?.[0]?.driver?.nama ||
+    '-';
   const penumpang = bus?.penumpang || 0;
   const kapasitas = bus?.kapasitas || 0;
 
-  const [imgSrc, setImgSrc] = useState("/assets/icons/Profile.svg");
+  const fotoFileName = bus?.driver_foto;
 
-  // DriverInfo.tsx
-  useEffect(() => {
-    const fotoDriver = bus?.foto_driver;
+  // 3. Bentuk URL
+  const urlFoto = fotoFileName
+    ? `${API_URL}/uploads/${fotoFileName}`
+    : "/assets/icons/Profile.svg";
 
-    if (fotoDriver) {
-      const url = fotoDriver.startsWith('http')
-        ? fotoDriver
-        : `${API_URL}/uploads/${fotoDriver}`;
-
-      setImgSrc(url);
-    } else {
-      setImgSrc("/assets/icons/Profile.svg");
-    }
-  }, [bus]);
-
+  console.log("Driver dari jadwal:", bus?.jadwal?.[0]?.driver);
+  console.log(bus);
   return (
     <div className="bg-white rounded-lg shadow-md p-4 flex items-center space-x-4">
-
       {/* Container Gambar */}
       <div className="relative w-14 h-14 flex-shrink-0">
         <img
-          src={imgSrc}
+          src={urlFoto}
           alt={`Foto ${nama}`}
           className="w-full h-full rounded-full object-cover border border-gray-200"
           onError={(e) => {
-            // Jika error, ganti ke icon default
+            // Jika link rusak, baru ganti ke default
             e.currentTarget.src = "/assets/icons/Profile.svg";
           }}
         />

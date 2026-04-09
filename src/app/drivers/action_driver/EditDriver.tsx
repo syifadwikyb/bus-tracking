@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { API_URL } from "@/lib/config";
 import Link from 'next/link';
 import Header from "@/components/Header";
+import Swal from "sweetalert2";
 
 export default function EditDriver({ id }: { id: string }) {
     const router = useRouter();
@@ -41,7 +42,7 @@ export default function EditDriver({ id }: { id: string }) {
                     status: data.status || "berhenti",
                 });
 
-                if (data.foto) setCurrentFoto(data.foto);
+                if (data.driver_foto) setCurrentFoto(data.driver_foto);
 
             } catch (error) {
                 console.error(error);
@@ -80,7 +81,7 @@ export default function EditDriver({ id }: { id: string }) {
             // Status TIDAK dikirim agar tidak merusak logika jadwal
 
             if (newFotoFile) {
-                payload.append("foto", newFotoFile);
+                payload.append("driver_foto", newFotoFile);
             }
 
             const response = await fetch(`${API_URL}/api/drivers/${id}`, {
@@ -90,10 +91,26 @@ export default function EditDriver({ id }: { id: string }) {
 
             if (!response.ok) throw new Error("Gagal update data");
 
-            alert("✅ Data Driver diperbarui!");
-            router.push("/drivers");
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Driver berhasil diperbarui!',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3B82F6'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    router.push("/drivers");
+                }
+            });
         } catch (error: any) {
-            alert(`❌ Error: ${error.message}`);
+            console.error(error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal Menyimpan',
+                text: `Terjadi kesalahan: ${error.message}`,
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Tutup'
+            });
         } finally {
             setLoading(false);
         }

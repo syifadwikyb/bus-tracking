@@ -8,7 +8,7 @@ interface Maintenance {
     id_maintenance: number;
     bus_id: number;
     tanggal_perbaikan: string;
-    tanggal_selesai?: string | null; // ✅ tambahkan ini
+    tanggal_selesai?: string | null;
     deskripsi: string;
     status: 'sedang diperbaiki' | 'dijadwalkan' | 'selesai' | string;
     harga: number;
@@ -50,7 +50,7 @@ const StatusBadge = ({ status }: { status: Maintenance['status'] }) => {
         .toString()
         .trim()
         .toLowerCase()
-        .replace(/_/g, ' '); // ganti underscore jadi spasi
+        .replace(/_/g, ' ');
 
     switch (normalized) {
         case 'sedang diperbaiki':
@@ -94,7 +94,6 @@ export default function MaintenanceRow({
                 {formatDate(maintenance.tanggal_perbaikan)}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                {/* ✅ tampilkan tanggal selesai jika ada */}
                 {maintenance.tanggal_selesai ? formatDate(maintenance.tanggal_selesai) : '-'}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 max-w-[250px] truncate">

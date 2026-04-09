@@ -9,6 +9,7 @@ import AddButton from '@/components/AddButton';
 import FilterDropdown from '@/components/FilterDropdown';
 import Pagination from '@/components/Pagination';
 import { API_URL } from '@/lib/config';
+import Swal from 'sweetalert2';
 
 export default function RouteTable() {
     const router = useRouter();
@@ -87,21 +88,48 @@ export default function RouteTable() {
 
     // Fungsi Delete (API Call)
     const handleDelete = async (route: Route) => {
-        const confirmDelete = window.confirm(`Apakah Anda yakin ingin menghapus rute ${route.nama_jalur}?`);
-        if (!confirmDelete) return;
+        // 1. Tampilkan SweetAlert untuk Konfirmasi
+        const result = await Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: `Hapus rute ${route.nama_jalur}? Tindakan ini tidak dapat dibatalkan!`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33', // Merah untuk aksi hapus
+            cancelButtonColor: '#3B82F6', // Biru untuk batal
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        });
 
-        try {
-            const res = await fetch(`${API_URL}/api/jalur/${route.id_jalur}`, {
-                method: "DELETE",
-            });
+        // 2. Jika user menekan tombol "Ya, hapus!"
+        if (result.isConfirmed) {
+            try {
+                const res = await fetch(`${API_URL}/api/jalur/${route.id_jalur}`, {
+                    method: "DELETE",
+                });
 
-            if (!res.ok) throw new Error("Gagal menghapus rute");
+                if (!res.ok) throw new Error("Gagal menghapus rute");
 
-            alert("✅ Rute berhasil dihapus");
-            fetchRoutes(); // Refresh data tabel
-        } catch (error) {
-            console.error(error);
-            alert("❌ Gagal menghapus rute. Pastikan rute tidak digunakan di jadwal.");
+                // 3. Tampilkan notifikasi sukses
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Dihapus!',
+                    text: 'Rute berhasil dihapus.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3B82F6'
+                });
+
+                fetchRoutes(); // Refresh data tabel
+            } catch (error: any) {
+                console.error('❌ Gagal menghapus:', error);
+
+                // 4. Tampilkan notifikasi error
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: error.message || "Gagal menghapus rute. Pastikan rute tidak digunakan di jadwal.",
+                    confirmButtonColor: '#EF4444'
+                });
+            }
         }
     };
 

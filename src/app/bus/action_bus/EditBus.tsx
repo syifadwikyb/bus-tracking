@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { API_URL } from "@/lib/config";
 import Link from 'next/link';
 import Header from "@/components/Header";
+import Swal from 'sweetalert2';
 
 export default function EditBus({ id }: { id: string }) {
     const router = useRouter();
@@ -16,7 +17,7 @@ export default function EditBus({ id }: { id: string }) {
         plat_nomor: "",
         kapasitas: "",
         jenis_bus: "",
-        status: "", // Hanya untuk display preview, tidak dikirim saat update
+        status: "",
     });
 
     // State untuk Foto
@@ -48,8 +49,15 @@ export default function EditBus({ id }: { id: string }) {
 
             } catch (error) {
                 console.error(error);
-                alert("Data bus tidak ditemukan");
-                router.push("/bus");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Tidak Ditemukan',
+                    text: 'Data bus tidak ditemukan atau terjadi kesalahan.',
+                    confirmButtonColor: '#EF4444',
+                    confirmButtonText: 'Kembali'
+                }).then(() => {
+                    router.push("/bus");
+                });
             } finally {
                 setLoadingData(false);
             }
@@ -78,14 +86,11 @@ export default function EditBus({ id }: { id: string }) {
         setLoading(true);
 
         try {
-            // Gunakan FormData agar bisa kirim file & teks bersamaan
             const payload = new FormData();
             payload.append("kode_bus", formData.kode_bus);
             payload.append("plat_nomor", formData.plat_nomor);
             payload.append("kapasitas", formData.kapasitas);
-            payload.append("jenis_bus", formData.jenis_bus);
-
-            // ⚠️ Status TIDAK dikirim, biarkan backend/sistem maintenance yang mengatur
+            payload.append("jenis_bus", formData.jenis_bus);    
 
             if (newFotoFile) {
                 payload.append("foto", newFotoFile);
@@ -93,16 +98,45 @@ export default function EditBus({ id }: { id: string }) {
 
             const response = await fetch(`${API_URL}/api/bus/${id}`, {
                 method: "PUT",
-                body: payload, // Browser otomatis set Content-Type multipart/form-data
+                body: payload,
             });
 
-            if (!response.ok) throw new Error("Gagal memperbarui data");
+            const responseText = await response.text();
+            console.log("Response Server:", responseText);
 
-            alert("✅ Data Bus berhasil diperbarui!");
-            router.push("/bus");
+            if (!response.ok) {
+                let errorMessage = "Gagal menyimpan data";
+                try {
+                    const errorJson = JSON.parse(responseText);
+                    if (errorJson.message) {
+                        errorMessage = errorJson.message;
+                    }
+                } catch (parseError) {                 
+                    errorMessage = `Server Error (${response.status}): Cek Console untuk detail.`;
+                }
+                throw new Error(errorMessage);
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Data bus berhasil diperbarui!',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3B82F6'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    router.push("/bus");
+                }
+            });
         } catch (error: any) {
             console.error(error);
-            alert(`❌ Error: ${error.message}`);
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal Menyimpan',
+                text: `Terjadi kesalahan: ${error.message}`,
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Tutup'
+            });
         } finally {
             setLoading(false);
         }

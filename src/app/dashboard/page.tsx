@@ -31,7 +31,7 @@ interface ApiBus {
     jalur_id: number;
     driver_id: number;
     status: string;
-    driver?: { nama: string, foto: string };
+    driver?: { nama: string; driver_foto: string };
   }[];
 }
 
@@ -91,7 +91,7 @@ const convertApiBusToBus = (apiBus: ApiBus, routes: any[] = [], drivers: any[] =
     nama_jalur: apiBus.nama_jalur || nama_jalur || null,
     terakhir_dilihat: apiBus.terakhir_dilihat,
     foto: apiBus.foto,
-    driver_foto: apiBus.driver_foto || jadwalAktif?.driver?.foto || null
+    driver_foto: apiBus.driver_foto || jadwalAktif?.driver?.driver_foto || null
   };
   
   return convertedBus;

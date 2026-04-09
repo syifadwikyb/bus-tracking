@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; // ➕ Import Router
+import { useRouter } from 'next/navigation';
 import BusRow from './BusRow';
 import SearchBar from '@/components/SearchBar';
 import AddButton from '@/components/AddButton';
 import FilterDropdown from '@/components/FilterDropdown';
 import Pagination from '@/components/Pagination';
 import { API_URL } from '@/lib/config';
+import Swal from 'sweetalert2';
 
 interface Bus {
     id_bus: number;
@@ -43,7 +44,7 @@ export default function BusTable() {
             setAllBuses(busData);
             setFilteredBuses(busData);
         } catch (err) {
-            console.error(err);
+            if (err instanceof Error) console.error('❌ Error fetch:', err.message);
         } finally {
             setLoading(false);
         }
@@ -81,26 +82,57 @@ export default function BusTable() {
 
     // --- FUNGSI DELETE BUS ---
     async function handleDelete(bus: Bus) {
-        const confirm = window.confirm(`Apakah Anda yakin ingin menghapus bus ${bus.plat_nomor}?`);
-        if (!confirm) return;
+        const result = await Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: `Hapus bus ${bus.plat_nomor}? Tindakan ini tidak dapat dibatalkan!`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3B82F6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        });
 
-        try {
-            const res = await fetch(`${API_URL}/api/bus/${bus.id_bus}`, {
-                method: "DELETE",
-            });
+        if (result.isConfirmed) {
+            try {
+                const res = await fetch(`${API_URL}/api/bus/${bus.id_bus}`, {
+                    method: "DELETE",
+                });
 
-            if (!res.ok) throw new Error("Gagal menghapus data");
+                if (!res.ok) {
+                    const errorData = await res.json().catch(() => ({}));
+                    throw new Error(errorData.message || "Gagal menghapus data");
+                }
 
-            alert("✅ Data Bus berhasil dihapus");
-            fetchBuses(); // Refresh tabel
-        } catch (error) {
-            console.error(error);
-            alert("❌ Gagal menghapus data. Pastikan bus tidak sedang digunakan di jadwal.");
+                // ✅ KONSISTENSI: Update state lokal tanpa fetch ulang
+                setAllBuses(allBuses.filter(b => b.id_bus !== bus.id_bus));
+                setFilteredBuses(filteredBuses.filter(b => b.id_bus !== bus.id_bus));
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Dihapus!',
+                    text: 'Data Bus berhasil dihapus.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3B82F6'
+                });
+
+            } catch (error: any) {
+                console.error('❌ Gagal menghapus:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: error.message || "Gagal menghapus data. Pastikan bus tidak sedang digunakan di jadwal.",
+                    confirmButtonColor: '#EF4444'
+                });
+            }
         }
     }
 
+    // ✅ KONSISTENSI: Rumus Pagination disamakan agar mudah dibaca
     const totalPages = Math.ceil(filteredBuses.length / perPage);
-    const currentData = filteredBuses.slice((currentPage - 1) * perPage, currentPage * perPage);
+    const indexOfLast = currentPage * perPage;
+    const indexOfFirst = indexOfLast - perPage;
+    const currentData = filteredBuses.slice(indexOfFirst, indexOfLast);
 
     return (
         <div className="bg-white rounded-lg shadow-lg">
@@ -112,7 +144,6 @@ export default function BusTable() {
                     onSubmit={(e) => e.preventDefault()}
                 />
                 <div className="flex items-center gap-2">
-                    {/* 👇 Pastikan route ini benar mengarah ke folder action_bus */}
                     <AddButton route="/bus/action_bus" />
 
                     <FilterDropdown

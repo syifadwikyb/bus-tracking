@@ -8,6 +8,7 @@ import AddButton from '@/components/AddButton';
 import Pagination from '@/components/Pagination';
 import FilterDropdown from '@/components/FilterDropdown';
 import { API_URL } from '@/lib/config';
+import Swal from 'sweetalert2';
 
 interface BusStop {
   id_halte: number;
@@ -91,21 +92,49 @@ export default function BusStopTable() {
     router.push(`/bus_stop/action_bus_stop?mode=edit&id=${halte.id_halte}`);
   };
 
-  const handleDelete = async (halte: BusStop) => {
-    if (!confirm(`Hapus halte ${halte.nama_halte}?`)) return;
+  const handleDelete = async (halte: BusStop) => {    
+    const result = await Swal.fire({
+      title: 'Apakah Anda yakin?',
+      text: `Hapus halte ${halte.nama_halte}? Tindakan ini tidak dapat dibatalkan!`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3B82F6',
+      confirmButtonText: 'Ya, hapus!',
+      cancelButtonText: 'Batal'
+    });
 
-    try {
-      const res = await fetch(`${API_URL}/api/halte/${halte.id_halte}`, {
-        method: "DELETE",
-      });
+    // 2. Jika user mengonfirmasi penghapusan
+    if (result.isConfirmed) {
+      try {
+        const res = await fetch(`${API_URL}/api/halte/${halte.id_halte}`, {
+          method: "DELETE",
+        });
 
-      if (!res.ok) throw new Error("Gagal menghapus halte");
+        if (!res.ok) throw new Error("Gagal menghapus halte");
 
-      alert("✅ Halte berhasil dihapus");
-      fetchBusStops();
-    } catch (error) {
-      console.error(error);
-      alert("❌ Gagal menghapus halte.");
+        // 3. Tampilkan notifikasi sukses
+        Swal.fire({
+          icon: 'success',
+          title: 'Dihapus!',
+          text: 'Data Halte berhasil dihapus.',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#3B82F6'
+        });
+
+        // Refresh data tabel
+        fetchBusStops();
+      } catch (error: any) {
+        console.error('❌ Gagal menghapus:', error);
+
+        // 4. Tampilkan notifikasi error
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal!',
+          text: error.message || "Gagal menghapus halte. Pastikan halte tidak sedang digunakan.",
+          confirmButtonColor: '#EF4444'
+        });
+      }
     }
   };
 
@@ -123,7 +152,7 @@ export default function BusStopTable() {
         {/* ✅ 2. Group Button & Filter di Kanan (Sesuai DriverTable) */}
         <div className="flex items-center gap-2 w-full md:w-auto">
           <AddButton route="/bus_stop/action_bus_stop" />
-          
+
           <FilterDropdown
             filters={[
               {

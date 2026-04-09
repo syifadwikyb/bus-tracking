@@ -8,6 +8,7 @@ import AddButton from '@/components/AddButton';
 import FilterDropdown from '@/components/FilterDropdown';
 import Pagination from '@/components/Pagination';
 import { API_URL } from '@/lib/config';
+import Swal from 'sweetalert2';
 
 interface Schedule {
     id_schedule: number;
@@ -73,21 +74,53 @@ export default function ScheduleTable() {
     }
 
     async function handleDelete(s: Schedule) {
-        const confirmDelete = confirm(`Apakah Anda yakin ingin menghapus jadwal Bus ${s.bus.plat_nomor}?`);
-        if (!confirmDelete) return;
+        // 1. Tampilkan SweetAlert untuk Konfirmasi
+        const result = await Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: `Hapus jadwal Bus ${s.bus.plat_nomor}? Tindakan ini tidak dapat dibatalkan!`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3B82F6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        });
 
-        try {
-            const res = await fetch(`${API_URL}/api/schedules/${s.id_schedule}`, {
-                method: "DELETE",
-            });
+        // 2. Cek apakah user menekan tombol "Ya, hapus!"
+        if (result.isConfirmed) {
+            try {
+                const res = await fetch(`${API_URL}/api/schedules/${s.id_schedule}`, {
+                    method: "DELETE",
+                });
 
-            if (!res.ok) throw new Error("Gagal menghapus jadwal");
+                if (!res.ok) {
+                    const errorData = await res.json().catch(() => ({}));
+                    throw new Error(errorData.message || "Gagal menghapus data");
+                }
 
-            alert("✅ Jadwal berhasil dihapus");
-            fetchSchedules();
-        } catch (error) {
-            console.error(error);
-            alert("❌ Gagal menghapus jadwal.");
+                setAllSchedules(allSchedules.filter(sc => sc.id_schedule !== s.id_schedule));
+                setFiltered(filtered.filter(sc => sc.id_schedule !== s.id_schedule));
+
+                // 3. SweetAlert Sukses
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Dihapus!',
+                    text: 'Jadwal berhasil dihapus.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3B82F6'
+                });
+
+            } catch (error: any) {
+                console.error('❌ Gagal menghapus:', error);
+
+                // 4. SweetAlert Error
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: error.message || "Gagal menghapus data. Pastikan bus tidak sedang digunakan di jadwal.",
+                    confirmButtonColor: '#EF4444'
+                });
+            }
         }
     }
 

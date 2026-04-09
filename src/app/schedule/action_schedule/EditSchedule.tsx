@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { API_URL } from "@/lib/config";
 import Link from 'next/link';
 import Header from "@/components/Header";
+import Swal from 'sweetalert2';
 
 interface Bus { id_bus: number; plat_nomor: string; status: string; foto: string | null; }
 interface Driver { id_driver: number; nama: string; status: string; }
@@ -83,9 +84,16 @@ export default function EditSchedule({ id }: { id: string }) {
                 if (s.jalur_id) setSelectedJalur(jalurList.find((j: Jalur) => j.id_jalur == s.jalur_id) || null);
 
             } catch (error) {
-                console.error("❌ Error fetching data:", error);
-                alert("Gagal memuat data edit.");
-                router.push("/schedule");
+                console.error(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Tidak Ditemukan',
+                    text: 'Jadwal tidak ditemukan atau terjadi kesalahan.',
+                    confirmButtonColor: '#EF4444',
+                    confirmButtonText: 'Kembali'
+                }).then(() => {
+                    router.push("/schedule");
+                });
             } finally {
                 setLoadingData(false);
             }
@@ -126,11 +134,26 @@ export default function EditSchedule({ id }: { id: string }) {
 
             if (!response.ok) throw new Error("Gagal update jadwal");
 
-            alert("✅ Jadwal berhasil diperbarui!");
-            router.push("/schedule");
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Jadwal berhasil diperbarui!',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3B82F6'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    router.push("/schedule");
+                }
+            });
         } catch (error) {
             console.error(error);
-            alert("❌ Gagal memperbarui jadwal.");
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal Memperbarui',
+                text: 'Terjadi kesalahan saat memperbarui jadwal.',
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Tutup'
+            });
         } finally {
             setLoading(false);
         }

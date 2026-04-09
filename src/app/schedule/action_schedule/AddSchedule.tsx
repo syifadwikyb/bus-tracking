@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { API_URL } from "@/lib/config";
 import Link from 'next/link';
 import Header from "@/components/Header";
+import Swal from 'sweetalert2';
 
 // Interface tipe data
 interface Bus {
@@ -23,8 +24,7 @@ interface Driver {
 interface Jalur {
     id_jalur: number;
     nama_jalur: string;
-    kota_asal: string;   // Sesuaikan dengan respon API (misal: kota_asal/asal)
-    kota_tujuan: string; // Sesuaikan dengan respon API (misal: kota_tujuan/tujuan)
+    status: string;
 }
 
 export default function AddSchedule() {
@@ -49,7 +49,6 @@ export default function AddSchedule() {
         tanggal: "",
         jamMulai: "",
         jamSelesai: "",
-        // ❌ Status dihapus dari state karena otomatis di backend
     });
 
     // 🔹 Ambil data Bus, Driver, dan Jalur
@@ -61,7 +60,7 @@ export default function AddSchedule() {
                 const busDataRaw = await busRes.json();
                 const busList = Array.isArray(busDataRaw) ? busDataRaw : (busDataRaw.data || []);
                 const availableBuses = busList.filter((b: Bus) =>
-                    ['berhenti', 'berjalan', 'dijadwalkan'].includes(b.status.toLowerCase())
+                    ['berhenti'].includes(b.status.toLowerCase())
                 );
                 setBuses(availableBuses);
 
@@ -69,13 +68,19 @@ export default function AddSchedule() {
                 const driverRes = await fetch(`${API_URL}/api/drivers`);
                 const driverDataRaw = await driverRes.json();
                 const driverList = Array.isArray(driverDataRaw) ? driverDataRaw : (driverDataRaw.data || []);
-                setDrivers(driverList);
+                const availableDrivers = driverList.filter((d: Driver) =>
+                    ['berhenti'].includes(d.status.toLowerCase())
+                );
+                setDrivers(availableDrivers);
 
                 // 3. Fetch Jalur
                 const jalurRes = await fetch(`${API_URL}/api/jalur`);
                 const jalurDataRaw = await jalurRes.json();
                 const jalurList = Array.isArray(jalurDataRaw) ? jalurDataRaw : (jalurDataRaw.data || []);
-                setJalurs(jalurList);
+                const availableJalurs = jalurList.filter((j: Jalur) =>
+                    ['berjalan'].includes(j.status.toLowerCase())
+                );
+                setJalurs(availableJalurs);
 
             } catch (error) {
                 console.error("❌ Gagal mengambil data referensi:", error);
@@ -127,7 +132,6 @@ export default function AddSchedule() {
                 tanggal: formData.tanggal,
                 jam_mulai: formData.jamMulai,
                 jam_selesai: formData.jamSelesai,
-                // ❌ Status tidak dikirim, backend akan set default 'dijadwalkan'
             };
 
             console.log("📤 Mengirim jadwal:", payload);
@@ -144,8 +148,17 @@ export default function AddSchedule() {
                 throw new Error(result.message || "Gagal menyimpan jadwal");
             }
 
-            alert("✅ Jadwal berhasil ditambahkan! Status akan diatur otomatis oleh sistem.");
-            router.push("/schedule");
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Jadwal berhasil ditambahkan!',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3B82F6'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    router.push("/schedule");
+                }
+            });
         } catch (error: any) {
             console.error("❌ Gagal simpan:", error);
             alert(`❌ Error: ${error.message}`);
@@ -265,8 +278,6 @@ export default function AddSchedule() {
                                     {jalurs.map((jalur) => (
                                         <option key={jalur.id_jalur} value={jalur.id_jalur}>
                                             {jalur.nama_jalur}
-                                            {/* Fallback jika kota_asal/tujuan tidak ada di API */}
-                                            {jalur.kota_asal ? ` (${jalur.kota_asal} - ${jalur.kota_tujuan})` : ''}
                                         </option>
                                     ))}
                                 </select>
@@ -370,17 +381,6 @@ export default function AddSchedule() {
                                             : "-"}
                                     </span>
                                 </div>
-
-                                {/* Status Preview (Otomatis) */}
-                                <div className="flex justify-between pt-2">
-                                    <span className="text-gray-500">Status Awal:</span>
-                                    <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-sm font-bold">
-                                        Otomatis (Dijadwalkan)
-                                    </span>
-                                </div>
-                                <p className="text-xs text-center text-gray-400 mt-2">
-                                    *Status akan berubah otomatis mengikuti waktu server.
-                                </p>
                             </div>
                         </div>
                     </div>

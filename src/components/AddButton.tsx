@@ -4,14 +4,14 @@ import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface AddButton {
-  route: string; // route tujuan
+  route: string;
 }
 
 export default function AddButton({ route }: AddButton) {
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(route); // redirect ke halaman yang ditentukan
+    router.push(route);
   };
 
   return (

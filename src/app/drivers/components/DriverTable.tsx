@@ -8,6 +8,7 @@ import AddButton from '@/components/AddButton';
 import FilterDropdown from '@/components/FilterDropdown';
 import Pagination from '@/components/Pagination';
 import { API_URL } from '@/lib/config';
+import Swal from 'sweetalert2';
 
 interface Driver {
   id_driver: number;
@@ -78,19 +79,47 @@ export default function DriverTable() {
 
   // --- DELETE FUNCTION ---
   const handleDelete = async (driver: Driver) => {
-    if (!confirm(`Hapus driver ${driver.nama}?`)) return;
+    const result = await Swal.fire({
+      title: 'Apakah Anda yakin?',
+      text: `Hapus driver ${driver.nama}? Tindakan ini tidak dapat dibatalkan!`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3B82F6',
+      confirmButtonText: 'Ya, hapus!',
+      cancelButtonText: 'Batal'
+    });
 
-    try {
-      const res = await fetch(`${API_URL}/api/drivers/${driver.id_driver}`, {
-        method: 'DELETE'
-      });
-      if (!res.ok) throw new Error("Gagal menghapus driver");
+    if (result.isConfirmed) {
+      try {
+        const res = await fetch(`${API_URL}/api/drivers/${driver.id_driver}`, {
+          method: 'DELETE'
+        });
 
-      alert("✅ Driver berhasil dihapus");
-      fetchDrivers(); // Refresh data
-    } catch (error) {
-      console.error(error);
-      alert("❌ Gagal menghapus driver.");
+        if (!res.ok) throw new Error("Gagal menghapus driver");
+
+        // Tampilkan notifikasi sukses
+        Swal.fire({
+          icon: 'success',
+          title: 'Dihapus!',
+          text: 'Data Driver berhasil dihapus.',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#3B82F6'
+        });
+
+        // Refresh data setelah berhasil dihapus
+        fetchDrivers();
+      } catch (error: any) {
+        console.error('❌ Gagal menghapus:', error);
+
+        // Tampilkan notifikasi error
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal!',
+          text: error.message || "Gagal menghapus driver.",
+          confirmButtonColor: '#EF4444'
+        });
+      }
     }
   };
 
@@ -103,7 +132,7 @@ export default function DriverTable() {
     <div className="bg-white rounded-lg shadow-lg">
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4">
         <SearchBar value={search} onChange={setSearch} onClear={() => setSearch('')} onSubmit={(e) => e.preventDefault()} />
-        <div className="flex items-center gap-2">          
+        <div className="flex items-center gap-2">
           <AddButton route="/drivers/action_driver" />
           <FilterDropdown
             filters={[{ label: 'Status', options: ['berjalan', 'berhenti', 'dijadwalkan'], value: filterStatus, onChange: setFilterStatus }]}

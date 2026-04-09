@@ -6,6 +6,7 @@ import { API_URL } from "@/lib/config";
 import Link from 'next/link';
 import Header from "@/components/Header";
 import dynamic from 'next/dynamic';
+import Swal from "sweetalert2";
 
 const BusStopMap = dynamic(() => import('../components/BusStopMap'), { ssr: false });
 
@@ -80,13 +81,33 @@ export default function EditBusStop({ id }: { id: string }) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
             });
+            
+            const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.message || "Gagal update data");
+            }
 
-            if (!response.ok) throw new Error("Gagal update data");
-
-            alert("✅ Halte berhasil diperbarui!");
-            router.push("/bus_stop");
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Data bus berhasil diperbarui!',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3B82F6'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    router.push("/bus_stop");
+                }
+            });
         } catch (error: any) {
-            alert(`❌ Error: ${error.message}`);
+            console.error(error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal Menyimpan',
+                text: `Terjadi kesalahan: ${error.message}`,
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Tutup'
+            });
         } finally {
             setLoading(false);
         }
@@ -132,7 +153,7 @@ export default function EditBusStop({ id }: { id: string }) {
                     <div className="lg:col-span-2 h-[500px] border border-gray-300 rounded-xl overflow-hidden relative">
                         <BusStopMap
                             position={formData.latitude ? { lat: parseFloat(formData.latitude), lng: parseFloat(formData.longitude) } : null}
-                            setPosition={handleMapSelect} 
+                            setPosition={handleMapSelect}
                         />
                     </div>
                 </form>

@@ -5,7 +5,7 @@ import MapView from './components/MapView';
 import BusTable from './components/BusTable';
 import DriverInfo from './components/DriverInfo';
 import BusDetail from './components/BusDetail';
-import BusChart from './components/BusChart';
+import BusETA from './components/BusETA';
 
 export type Bus = {
   id_bus: number;
@@ -97,10 +97,13 @@ export default function DashboardClient({
               className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
             >
               <option value="">Semua Rute</option>
-              {routes.map(route => (
-                <option key={route.id_jalur} value={route.id_jalur}>
-                  {route.nama_jalur}
-                </option>
+              {/* TAMBAHKAN FILTER DI SINI */}
+              {routes
+                .filter(route => route.status?.toLowerCase() === 'berjalan') // Sesuaikan 'aktif' dengan data dari backend
+                .map(route => (
+                  <option key={route.id_jalur} value={route.id_jalur}>
+                    {route.nama_jalur}
+                  </option>
               ))}
             </select>
           </div>
@@ -129,7 +132,7 @@ export default function DashboardClient({
       <div className="flex flex-col gap-6">
         <DriverInfo bus={displayedBus} />
         <BusDetail bus={displayedBus} />
-        <BusChart /> 
+        <BusETA bus={displayedBus} />
       </div>
     </div>
   );

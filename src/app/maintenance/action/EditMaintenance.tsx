@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { API_URL } from "@/lib/config";
 import Link from 'next/link';
 import Header from "@/components/Header";
+import Swal from 'sweetalert2';
 
 // Fungsi untuk memformat tanggal YYYY-MM-DD
 const formatDateForInput = (dateString: string | null | undefined) => {
@@ -150,8 +151,17 @@ const EditMaintenance: React.FC<{ id: string }> = ({ id }) => {
                 throw new Error(result.message || "Gagal memperbarui data");
             }
 
-            alert("✅ Data maintenance berhasil diperbarui!");
-            router.push("/maintenance");
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Data maintenance berhasil diperbarui!',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3B82F6'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    router.push("/maintenance");
+                }
+            });
         } catch (error) {
             console.error("❌ Gagal memperbarui data:", error);
             alert("❌ Terjadi kesalahan saat memperbarui data.");

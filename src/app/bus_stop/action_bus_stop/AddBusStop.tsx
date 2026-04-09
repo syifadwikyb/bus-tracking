@@ -6,6 +6,7 @@ import { API_URL } from "@/lib/config";
 import Link from 'next/link';
 import Header from "@/components/Header";
 import dynamic from 'next/dynamic';
+import Swal from "sweetalert2";
 
 const BusStopMap = dynamic(() => import('../components/BusStopMap'), { ssr: false });
 
@@ -71,21 +72,43 @@ export default function AddBusStop() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // 🛡️ VALIDASI FRONTEND (PENTING!)
-        // Mencegah pengiriman data kosong/null yang menyebabkan Validation Error
+        // Validasi Lokasi Peta
         if (!formData.latitude || !formData.longitude) {
-            alert("⚠️ Harap KLIK PETA untuk menentukan lokasi Halte!");
-            return;
-        }
-        if (!formData.jalur_id) {
-            alert("⚠️ Harap pilih Jalur!");
-            return;
-        }
-        if (!formData.urutan) {
-            alert("⚠️ Harap isi Urutan Halte!");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Lokasi Belum Dipilih!',
+                text: 'Harap KLIK PETA untuk menentukan lokasi Halte!',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3B82F6' // Warna biru standar untuk tombol OK
+            });
             return;
         }
 
+        // Validasi Jalur
+        if (!formData.jalur_id) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Jalur Kosong!',
+                text: 'Harap pilih Jalur untuk halte ini!',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3B82F6'
+            });
+            return;
+        }
+
+        // Validasi Urutan
+        if (!formData.urutan) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Urutan Kosong!',
+                text: 'Harap isi Urutan Halte pada jalur tersebut!',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3B82F6'
+            });
+            return;
+        }
+
+        // Jika semua validasi lolos, lanjutkan proses
         setLoading(true);
 
         try {
@@ -113,11 +136,26 @@ export default function AddBusStop() {
                 throw new Error(result.message || `Gagal menyimpan (${response.status})`);
             }
 
-            alert("✅ Halte berhasil ditambahkan!");
-            router.push("/bus_stop");
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Data bus berhasil ditambahkan!',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3B82F6'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    router.push("/bus_stop");
+                }
+            });
         } catch (error: any) {
-            console.error(error);
-            alert(`❌ Error: ${error.message}`);
+            console.error("❌ Gagal simpan:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal Menyimpan',
+                text: `Terjadi kesalahan: ${error.message}`,
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Tutup'
+            });
         } finally {
             setLoading(false);
         }

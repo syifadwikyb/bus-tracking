@@ -6,6 +6,7 @@ import { API_URL } from "@/lib/config";
 import Link from 'next/link';
 import Header from "@/components/Header";
 import dynamic from 'next/dynamic';
+import Swal from "sweetalert2";
 
 // Import Map secara dinamis (PENTING untuk Next.js)
 const RouteMap = dynamic(() => import('../components/RouteMap'), { ssr: false });
@@ -36,7 +37,13 @@ export default function AddRoute() {
         e.preventDefault();
 
         if (points.length < 2) {
-            alert("⚠️ Harap buat jalur di peta minimal 2 titik!");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Jalur Kosong!',
+                text: 'Harap buat jalur di peta minimal 2 titik!',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3B82F6'
+            });
             return;
         }
 
@@ -69,11 +76,26 @@ export default function AddRoute() {
                 throw new Error(result?.message || `Gagal menyimpan rute (${response.status})`);
             }
 
-            alert("✅ Rute berhasil ditambahkan!");
-            router.push("/route");
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Rute berhasil diperbarui!',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3B82F6'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    router.push("/route");
+                }
+            });
         } catch (error: any) {
-            console.error("❌ Error Submit:", error);
-            alert(`❌ Error: ${error.message}`);
+            console.error(error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal Menyimpan',
+                text: `Terjadi kesalahan: ${error.message}`,
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Tutup'
+            });
         } finally {
             setLoading(false);
         }
@@ -131,13 +153,23 @@ export default function AddRoute() {
                     </div>
 
                     {/* KOLOM KANAN (MAPS INTERAKTIF) */}
-                    <div className="lg:col-span-2 h-[500px] border border-gray-300 rounded-xl overflow-hidden relative">
+                    <div className="lg:col-span-2 h-[500px] border border-gray-300 rounded-xl overflow-hidden relative shadow-inner">
                         {/* Panggil komponen Map */}
                         <RouteMap points={points} setPoints={setPoints} />
 
-                        <div className="absolute top-2 right-2 bg-white px-3 py-1 rounded-md shadow z-[1000] text-xs font-bold">
+                        {/* Indikator Total Titik */}
+                        <div className="absolute top-2 right-2 bg-white px-3 py-1 rounded-md shadow z-[1000] text-xs font-bold text-gray-700">
                             Total Titik: {points.length}
                         </div>
+
+                        {/* Overlay Instruksi jika belum ada titik yang dipilih */}
+                        {points.length === 0 && (
+                            <div className="absolute inset-0 bg-black/10 flex items-center justify-center z-[1000] pointer-events-none">
+                                <div className="bg-white/90 px-4 py-2 rounded-full shadow-lg text-sm font-bold text-gray-700 animate-bounce">
+                                    👆 Silakan Klik Peta untuk Memulai Titik Rute
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                 </form>

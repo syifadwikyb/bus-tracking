@@ -6,6 +6,7 @@ import { API_URL } from "@/lib/config";
 import Link from 'next/link';
 import Header from "@/components/Header";
 import dynamic from 'next/dynamic';
+import Swal from "sweetalert2";
 
 const RouteMap = dynamic(() => import('../components/RouteMap'), { ssr: false });
 
@@ -31,7 +32,7 @@ export default function EditRoute({ id }: { id: string }) {
 
             try {
                 const res = await fetch(`${API_URL}/api/jalur/${id}`);
-                
+
                 if (!res.ok) {
                     const errText = await res.text();
                     throw new Error(`Gagal fetch data (Server ${res.status}): ${errText}`);
@@ -66,8 +67,16 @@ export default function EditRoute({ id }: { id: string }) {
                     }
                 }
             } catch (error: any) {
-                console.error("❌ Error Fetch:", error);
-                setError(error.message);
+                console.error(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Tidak Ditemukan',
+                    text: 'Jalur tidak ditemukan atau terjadi kesalahan.',
+                    confirmButtonColor: '#EF4444',
+                    confirmButtonText: 'Kembali'
+                }).then(() => {
+                    router.push("/route");
+                });
             } finally {
                 setLoadingData(false);
             }
@@ -78,7 +87,7 @@ export default function EditRoute({ id }: { id: string }) {
     // --- SUBMIT DATA ---
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (points.length < 2) {
             alert("⚠️ Harap buat jalur di peta minimal 2 titik!");
             return;
@@ -108,18 +117,33 @@ export default function EditRoute({ id }: { id: string }) {
                 throw new Error(errData.message || "Gagal update rute");
             }
 
-            alert("✅ Rute berhasil diperbarui!");
-            router.push("/route");
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Jalur berhasil diperbarui!',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3B82F6'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    router.push("/route");
+                }
+            });
         } catch (error: any) {
             console.error(error);
-            alert(`❌ Error: ${error.message}`);
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal Menyimpan',
+                text: `Terjadi kesalahan: ${error.message}`,
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Tutup'
+            });
         } finally {
             setLoading(false);
         }
     };
 
     if (loadingData) return <div className="p-10 text-center">Memuat data rute...</div>;
-    
+
     // Tampilan Error jika ID tidak ditemukan / Server Error
     if (error) return (
         <div className="p-10 text-center">
@@ -131,7 +155,7 @@ export default function EditRoute({ id }: { id: string }) {
     return (
         <div className="">
             <Header subtitle="Edit Rute" title="Perbarui Data Jalur" />
-            
+
             <div className="p-6 bg-white rounded-2xl shadow-md">
                 <p className="text-sm text-gray-500 mb-6">
                     <Link href="/route" className="hover:text-blue-600 hover:underline">List Rute</Link>
@@ -144,26 +168,26 @@ export default function EditRoute({ id }: { id: string }) {
                     <div className="lg:col-span-1 space-y-4">
                         <div>
                             <label className="block font-medium mb-1">Kode Jalur</label>
-                            <input type="text" value={formData.kode_jalur} onChange={(e) => setFormData({...formData, kode_jalur: e.target.value})} className="w-full border border-blue-400 rounded-xl p-2" required />
+                            <input type="text" value={formData.kode_jalur} onChange={(e) => setFormData({ ...formData, kode_jalur: e.target.value })} className="w-full border border-blue-400 rounded-xl p-2" required />
                         </div>
                         <div>
                             <label className="block font-medium mb-1">Nama Jalur</label>
-                            <input type="text" value={formData.nama_jalur} onChange={(e) => setFormData({...formData, nama_jalur: e.target.value})} className="w-full border border-blue-400 rounded-xl p-2" required />
+                            <input type="text" value={formData.nama_jalur} onChange={(e) => setFormData({ ...formData, nama_jalur: e.target.value })} className="w-full border border-blue-400 rounded-xl p-2" required />
                         </div>
                         <div>
                             <label className="block font-medium mb-1">Status</label>
-                            <select value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value})} className="w-full border border-blue-400 rounded-xl p-2">
+                            <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full border border-blue-400 rounded-xl p-2">
                                 <option value="aktif">Aktif</option>
                                 <option value="tidak aktif">Tidak Aktif</option>
                             </select>
                         </div>
-                        
+
                         <div className="pt-4 border-t">
                             <button type="button" onClick={() => setPoints([])} className="w-full py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 text-sm mt-2 transition">
                                 ↺ Reset / Hapus Jalur Peta
                             </button>
                         </div>
-                        
+
                         <div className="flex justify-end gap-2 pt-4 border-t mt-4">
                             <Link href="/route" className="px-4 py-2 bg-red-100 text-red-600 rounded-lg font-medium hover:bg-red-200">Batal</Link>
                             <button type="submit" disabled={loading} className="px-4 py-2 bg-teal-100 text-teal-700 rounded-lg font-medium hover:bg-teal-200">

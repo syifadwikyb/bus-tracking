@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { API_URL } from "@/lib/config";
 import Link from 'next/link';
 import Header from "@/components/Header";
+import Swal from 'sweetalert2';
 
 const AddMaintenance: React.FC = () => {
     const router = useRouter();
@@ -48,8 +49,7 @@ const AddMaintenance: React.FC = () => {
                 const availableBuses = busesData.filter(
                     (bus: any) =>
                         bus.status?.toLowerCase() === "berhenti" ||
-                        bus.status?.toLowerCase() === "berjalan" ||
-                        bus.status?.toLowerCase() === "dalam perbaikan"
+                        bus.status?.toLowerCase() === "berjalan"
                 );
 
                 setBuses(availableBuses);
@@ -124,8 +124,17 @@ const AddMaintenance: React.FC = () => {
                 throw new Error(result.message || "Gagal menyimpan data maintenance");
             }
 
-            alert("✅ Data maintenance berhasil disimpan!");
-            router.push("/maintenance");
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Data maintenance berhasil ditambahkan!',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3B82F6'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    router.push("/maintenance");
+                }
+            });
         } catch (error) {
             console.error("❌ Gagal menyimpan data:", error);
             alert("❌ Terjadi kesalahan saat menyimpan data maintenance.");

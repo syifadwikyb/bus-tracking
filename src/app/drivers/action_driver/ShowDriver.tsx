@@ -35,8 +35,8 @@ export default function ShowDriver({ id }: { id: string }) {
                 <div className="flex flex-col md:flex-row items-center gap-8 border-b pb-8">
                     {/* FOTO PROFIL */}
                     <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-teal-50 shadow-lg flex-shrink-0">
-                        {data.foto ? (
-                            <img src={`${API_URL}/uploads/${data.foto}`} alt="Foto Driver" className="w-full h-full object-cover" />
+                        {data.driver_foto ? (
+                            <img src={`${API_URL}/uploads/${data.driver_foto}`} alt="Foto Driver" className="w-full h-full object-cover" />
                         ) : (
                             <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 text-4xl">👤</div>
                         )}
@@ -46,10 +46,10 @@ export default function ShowDriver({ id }: { id: string }) {
                         <h2 className="text-3xl font-bold text-gray-800">{data.nama}</h2>
                         <p className="text-gray-500 text-lg mb-2">{data.kode_driver}</p>
                         <span className={`inline-block px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide uppercase
-                            ${data.status === 'berjalan' ? 'bg-green-100 text-green-700' :
-                                data.status === 'dijadwalkan' ? 'bg-blue-100 text-blue-700' :
+    ${data.status?.toLowerCase() === 'berjalan' ? 'bg-green-100 text-green-700' :
+                                data.status?.toLowerCase() === 'dijadwalkan' ? 'bg-blue-100 text-blue-700' :
                                     'bg-orange-100 text-orange-700'}`}>
-                            {data.status}
+                            {data.status || 'TIDAK ADA STATUS'}
                         </span>
                     </div>
                 </div>

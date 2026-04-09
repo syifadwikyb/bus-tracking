@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { type Bus } from "../DashboardClient";
+import { type Bus } from "../DashboardClient"; // Sesuaikan path ini jika berbeda
 import { API_URL } from '@/lib/config';
 
 type BusDetailProps = {
@@ -34,25 +34,32 @@ const DetailRow = ({
 );
 
 export default function BusDetail({ bus }: BusDetailProps) {
-  const [imgSrc, setImgSrc] = useState("/assets/icons/bus-placeholder.svg");
-  const [activeTab, setActiveTab] = useState<'detail' | 'prediksi'>('detail');
+  const [imgSrc, setImgSrc] = useState("/assets/icons/bus.svg");
 
   useEffect(() => {
+    // TAMBAHKAN LOG INI UNTUK DEBUGGING
+    console.log("Data Bus dari Dashboard:", bus);
+    
     if (bus?.foto) {
       const url = bus.foto.startsWith("http") ? bus.foto : `${API_URL}/uploads/${bus.foto}`;
+      
+      // TAMBAHKAN LOG INI JUGA
+      console.log("URL Gambar Final:", url);
+      
       setImgSrc(url);
     } else {
-      setImgSrc("/assets/icons/bus-placeholder.svg");
+      setImgSrc("/assets/icons/bus.svg");
     }
-  }, [bus]);
+  }, [bus]);  
 
+  // Tampilan Placeholder Jika Bus Belum Dipilih
   if (!bus || bus.id_bus === 0) {
     return (
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center items-center text-center min-h-[300px]">
         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
           <span className="text-2xl">🚌</span>
         </div>
-        <h3 className="text-lg font-semibold text-gray-800">Detail & Prediksi Bus</h3>
+        <h3 className="text-lg font-semibold text-gray-800">Detail Bus</h3>
         <p className="text-sm text-gray-500 mt-2">
           Pilih bus dari peta atau tabel<br />untuk melihat detail lengkap.
         </p>
@@ -60,113 +67,29 @@ export default function BusDetail({ bus }: BusDetailProps) {
     );
   }
 
-  const formatDistance = (meters: number) => {
-    if (meters < 1000) return `${meters} m`;
-    return `${(meters / 1000).toFixed(1)} km`;
-  };
-
+  // Tampilan Utama Bus Detail
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden w-full">
-
-      {/* --- MENU TABS --- */}
-      <div className="flex border-b border-gray-200 bg-gray-50/50">
-        <button
-          onClick={() => setActiveTab('detail')}
-          className={`flex-1 py-3.5 text-sm font-semibold text-center border-b-2 transition-colors duration-200 ${activeTab === 'detail'
-              ? 'border-blue-600 text-blue-700 bg-white'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-            }`}
-        >
-          Detail Bus
-        </button>
-        <button
-          onClick={() => setActiveTab('prediksi')}
-          className={`flex-1 py-3.5 text-sm font-semibold text-center border-b-2 transition-colors duration-200 ${activeTab === 'prediksi'
-              ? 'border-blue-600 text-blue-700 bg-white'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-            }`}
-        >
-          Prediksi Kedatangan
-        </button>
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 overflow-hidden w-full">
+      <h3 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Detail Bus</h3>
+      
+      <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden mb-6 border border-gray-200">
+        <Image
+          src={imgSrc}
+          alt={`Bus ${bus.plat_nomor}`}
+          fill
+          className="object-cover"
+          onError={() => setImgSrc("/assets/icons/bus.svg")}
+          sizes="(max-width: 768px) 100vw, 300px"
+          priority
+        />
       </div>
 
-      {/* --- KONTEN TABS --- */}
-      <div className="p-6">
-
-        {/* Konten 1: DETAIL BUS */}
-        {/* Menggunakan class 'block' dan 'hidden' agar lebih aman di Next.js */}
-        <div className={`${activeTab === 'detail' ? 'block' : 'hidden'}`}>
-          <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden mb-6 border border-gray-200">
-            <Image
-              src={imgSrc}
-              alt={`Bus ${bus.plat_nomor}`}
-              fill
-              className="object-cover"
-              onError={() => setImgSrc("/assets/icons/bus-placeholder.svg")}
-              sizes="(max-width: 768px) 100vw, 300px"
-              priority
-            />
-          </div>
-
-          <div className="flex flex-col">
-            <DetailRow label="Nomor Polisi" value={bus.plat_nomor} />
-            <DetailRow label="Kode Bus" value={bus.kode_bus} />
-            <DetailRow label="Jalur" value={bus.nama_jalur} />
-            <DetailRow label="Jenis Bus" value={bus.jenis_bus} />
-            <DetailRow label="Status Operasional" value={bus.status} isStatus />
-          </div>
-        </div>
-
-        {/* Konten 2: PREDIKSI KEDATANGAN */}
-        {/* max-h-[400px] mencegah tab kepanjangan, overflow-y-auto memunculkan scroll */}
-        <div className={`${activeTab === 'prediksi' ? 'block' : 'hidden'} max-h-[400px] overflow-y-auto pr-2`}>
-          {!bus.daftar_eta || bus.daftar_eta.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-10 text-center text-gray-500">
-              <span className="text-4xl mb-4 opacity-50">⏳</span>
-              <p className="text-sm">Prediksi rute belum tersedia atau<br />bus sedang tidak beroperasi.</p>
-            </div>
-          ) : (
-            <div className="relative border-l-2 border-blue-200 ml-4 mt-2">
-              {bus.daftar_eta.map((eta: any, index: number) => {
-                
-                // HANYA halte yang sedang dituju yang menjadi biru
-                const isTarget = eta.is_target; 
-                const etaMinutes = eta.eta_seconds ? Math.ceil(eta.eta_seconds / 60) : 0;
-
-                return (
-                  <div key={eta.halte_id || index} className="mb-6 ml-6 relative">
-
-                    {/* Lingkaran Titik Timeline */}
-                    <span className={`absolute flex items-center justify-center w-4 h-4 rounded-full -left-[1.95rem] ring-4 ring-white transition-colors duration-300
-                      ${isTarget ? 'bg-blue-600 shadow-sm' : 'bg-gray-300'}`}>
-                    </span>
-
-                    <div className="flex justify-between items-start bg-white">
-                      <div className="pr-3">
-                        <h4 className={`text-sm font-semibold transition-colors duration-300 ${isTarget ? 'text-blue-700' : 'text-gray-700'}`}>
-                          {eta.nama_halte}
-                        </h4>
-                        
-                        <p className="text-xs text-gray-500 mt-1">
-                           Berjarak {formatDistance(eta.distance_meters)}
-                        </p>
-                      </div>
-
-                      {/* Kotak Waktu */}
-                      <div className={`text-right shrink-0 transition-all duration-300 ${isTarget ? 'bg-blue-50 px-3 py-1.5 rounded-md border border-blue-100' : 'py-1.5'}`}>
-                        <span className={`text-sm font-bold ${isTarget ? 'text-blue-700' : 'text-gray-600'}`}>
-                          {eta.eta_seconds === null ? '...' : (etaMinutes < 1 ? '< 1 Menit' : `${etaMinutes} Menit`)}
-                        </span>
-                      </div>
-                    </div>
-
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
+      <div className="flex flex-col">
+        <DetailRow label="Nomor Polisi" value={bus.plat_nomor} />
+        <DetailRow label="Kode Bus" value={bus.kode_bus} />
+        <DetailRow label="Jalur" value={bus.nama_jalur} />
+        <DetailRow label="Jenis Bus" value={bus.jenis_bus} />
+        <DetailRow label="Status Operasional" value={bus.status} isStatus />
       </div>
     </div>
   );

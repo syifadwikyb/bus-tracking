@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { API_URL } from "@/lib/config";
 import Link from 'next/link';
 import Header from "@/components/Header";
+import Swal from "sweetalert2";
 
 export default function AddDriver() {
     const router = useRouter();
@@ -58,7 +59,7 @@ export default function AddDriver() {
             payload.append("status", "berhenti");
 
             if (fotoFile) {
-                payload.append("foto", fotoFile);
+                payload.append("driver_foto", fotoFile);
             }
 
             const response = await fetch(`${API_URL}/api/drivers`, {
@@ -71,11 +72,26 @@ export default function AddDriver() {
                 throw new Error(result.message || "Gagal menyimpan data driver");
             }
 
-            alert("✅ Driver berhasil ditambahkan!");
-            router.push("/drivers");
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Sopir berhasil ditambahkan!',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3B82F6'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    router.push("/drivers");
+                }
+            });
         } catch (error: any) {
             console.error("❌ Gagal simpan:", error);
-            alert(`❌ Error: ${error.message}`);
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal Menyimpan',
+                text: `Terjadi kesalahan: ${error.message}`,
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Tutup'
+            });
         } finally {
             setLoading(false);
         }

@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import { Quicksand } from "next/font/google";
 import "./globals.css";
+import "leaflet/dist/leaflet.css";
 import ClientLayout from "./ClientLayout";
 import SessionGuard from "@/components/SessionGuard";
 

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { API_URL } from "@/lib/config";
 import Link from 'next/link';
 import Header from "@/components/Header";
+import Swal from 'sweetalert2';
 
 export default function AddBus() {
     const router = useRouter();
@@ -35,11 +36,11 @@ export default function AddBus() {
             // Validasi ukuran (opsional, misal max 2MB)
             if (file.size > 2 * 1024 * 1024) {
                 alert("Ukuran file terlalu besar! Maksimal 2MB.");
-                e.target.value = ""; // Reset input
+                e.target.value = "";
                 return;
             }
             setFotoFile(file);
-            setFotoPreview(URL.createObjectURL(file)); // Buat URL lokal untuk preview
+            setFotoPreview(URL.createObjectURL(file));
         }
     }
 
@@ -48,7 +49,6 @@ export default function AddBus() {
         e.preventDefault();
         setLoading(true);
 
-        // 🔍 DEBUG: Cek URL yang ditembak
         console.log("🚀 Mengirim ke:", `${API_URL}/api/bus`);
 
         try {
@@ -57,7 +57,7 @@ export default function AddBus() {
             payload.append("plat_nomor", formData.plat_nomor);
             payload.append("kapasitas", formData.kapasitas);
             payload.append("jenis_bus", formData.jenis_bus);
-            payload.append("status", "berhenti"); // Default status
+            payload.append("status", "berhenti");
 
             if (fotoFile) {
                 payload.append("foto", fotoFile);
@@ -66,34 +66,45 @@ export default function AddBus() {
             const response = await fetch(`${API_URL}/api/bus`, {
                 method: "POST",
                 body: payload,
-                // ⚠️ JANGAN PAKAI HEADERS 'Content-Type' SAAT UPLOAD FILE
             });
 
-            // 🛑 Cek Response SEBELUM parse JSON
-            const responseText = await response.text(); // Ambil response sebagai text dulu
-
-            console.log("📦 Response Server:", responseText); // Lihat isi aslinya di Console
+            const responseText = await response.text();
+            console.log("📦 Response Server:", responseText);
 
             if (!response.ok) {
-                // Coba parse JSON jika bisa, jika tidak pakai text asli
+                let errorMessage = "Gagal menyimpan data";
                 try {
                     const errorJson = JSON.parse(responseText);
-                    throw new Error(errorJson.message || "Gagal menyimpan data");
-                } catch {
-                    // Jika gagal parse JSON, berarti errornya HTML
-                    throw new Error(`Server Error (${response.status}): Cek Console untuk detail.`);
+                    if (errorJson.message) {
+                        errorMessage = errorJson.message;
+                    }
+                } catch (parseError) {                 
+                    errorMessage = `Server Error (${response.status}): Cek Console untuk detail.`;
                 }
+                throw new Error(errorMessage);
             }
 
-            // Jika sukses, baru parse JSON (opsional, karena kita sudah yakin sukses)
-            // const result = JSON.parse(responseText); 
-
-            alert("✅ Data Bus berhasil ditambahkan!");
-            router.push("/bus");
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Data bus berhasil ditambahkan!',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3B82F6'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    router.push("/bus");
+                }
+            });
 
         } catch (error: any) {
             console.error("❌ Gagal simpan:", error);
-            alert(`❌ Error: ${error.message}`);
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal Menyimpan',
+                text: `Terjadi kesalahan: ${error.message}`,
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Tutup'
+            });
         } finally {
             setLoading(false);
         }
@@ -247,12 +258,9 @@ export default function AddBus() {
                                 <div className="flex justify-between pt-2">
                                     <span className="text-gray-500">Status Awal:</span>
                                     <span className="bg-orange-100 text-orange-600 px-2 py-0.5 rounded text-sm font-bold capitalize">
-                                        Berhenti (Default)
+                                        Berhenti
                                     </span>
-                                </div>
-                                <p className="text-xs text-center text-gray-400 mt-2">
-                                    *Status akan berubah otomatis saat ada jadwal atau maintenance.
-                                </p>
+                                </div>                                
                             </div>
                         </div>
                     </div>

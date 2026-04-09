@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import dynamic from "next/dynamic";
-import "leaflet/dist/leaflet.css";
 import { useMap } from "react-leaflet";
 import type { Bus } from "../DashboardClient";
 
