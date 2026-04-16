@@ -5,7 +5,7 @@ import { MapContainer, TileLayer, Marker, Polyline, useMapEvents } from 'react-l
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Fix icon marker leaflet yang hilang di Next.js
+
 const iconUrl = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png';
 const iconRetinaUrl = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png';
 const shadowUrl = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png';
@@ -18,7 +18,7 @@ const customIcon = L.icon({
     iconAnchor: [12, 41],
 });
 
-// Komponen untuk menangani klik di peta
+
 function ClickHandler({ onMapClick, readOnly }: { onMapClick: (latlng: L.LatLng) => void, readOnly?: boolean }) {
     useMapEvents({
         click(e) {
@@ -31,13 +31,13 @@ function ClickHandler({ onMapClick, readOnly }: { onMapClick: (latlng: L.LatLng)
 }
 
 interface RouteMapProps {
-    points: [number, number][]; // Array koordinat [lat, lng]
-    setPoints?: (points: [number, number][]) => void; // Fungsi update state (opsional utk readOnly)
+    points: [number, number][]; 
+    setPoints?: (points: [number, number][]) => void; 
     readOnly?: boolean;
 }
 
 const RouteMap = ({ points, setPoints, readOnly = false }: RouteMapProps) => {
-    // Pusat peta default (Misal: Semarang/Indonesia)
+    
     const defaultCenter: [number, number] = [-6.966667, 110.416664];
 
     const handleMapClick = (latlng: L.LatLng) => {

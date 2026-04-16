@@ -95,7 +95,7 @@ const convertApiBusToBus = (apiBus: ApiBus, routes: any[] = [], drivers: any[] =
     foto: apiBus.foto,
     driver_foto: apiBus.driver_foto || jadwalAktif?.driver?.driver_foto || driver_foto || null
   };
-  
+
   return convertedBus;
 };
 
@@ -175,24 +175,34 @@ export default function Page() {
 
     // Handler Lokasi & Penumpang
     const handleBusLocation = (data: SocketLocationData) => {
-      const targetId = data.id_bus || data.bus_id;
+      // ✅ 1. Pastikan targetId dikonversi menjadi Angka murni
+      const targetId = Number(data.id_bus || data.bus_id);
+
       if (!targetId) return;
+
+      // 🔍 CEK CONSOLE: Hapus tanda // di bawah ini jika ingin melihat data masuk
+      console.log("📍 Socket Masuk -> ID:", targetId, "Lat:", data.latitude, "Lng:", data.longitude);
 
       // Update State Daftar Bus
       setBuses((currentBuses) => {
-        const exists = currentBuses.some(b => b.id_bus === targetId);
-        if (!exists) return currentBuses;
+        // ✅ 2. Samakan tipe datanya menggunakan Number()
+        const exists = currentBuses.some(b => Number(b.id_bus) === targetId);
+
+        if (!exists) {
+          // Jika log ini muncul, berarti ID dari IoT beda dengan ID di database
+          console.warn(`⚠️ Socket ditolak: Bus dengan ID ${targetId} tidak ada di database.`);
+          return currentBuses;
+        }
 
         return currentBuses.map((bus) => {
-          if (bus.id_bus === targetId) {
+          if (Number(bus.id_bus) === targetId) {
             return {
               ...bus,
-              latitude: data.latitude,
-              longitude: data.longitude,
-              // ✅ Status otomatis 'berjalan' jika bergerak
+              // ✅ 3. Paksa ubah koordinat menjadi Float (Desimal)
+              latitude: parseFloat(String(data.latitude)),
+              longitude: parseFloat(String(data.longitude)),
               status: 'berjalan',
               terakhir_dilihat: new Date().toISOString(),
-              // ✅ Update Penumpang (Jika dikirim backend, jika tidak pakai data lama)
               penumpang: (data.passenger_count !== undefined)
                 ? data.passenger_count
                 : bus.penumpang,
@@ -205,11 +215,11 @@ export default function Page() {
 
       // Update Selected Bus (Popup Peta)
       setSelectedBus((prev) => {
-        if (prev && prev.id_bus === targetId) {
+        if (prev && Number(prev.id_bus) === targetId) {
           return {
             ...prev,
-            latitude: data.latitude,
-            longitude: data.longitude,
+            latitude: parseFloat(String(data.latitude)),
+            longitude: parseFloat(String(data.longitude)),
             status: 'berjalan',
             terakhir_dilihat: new Date().toISOString(),
             penumpang: (data.passenger_count !== undefined)
