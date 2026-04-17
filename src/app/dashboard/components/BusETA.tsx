@@ -40,7 +40,7 @@ export default function BusETA({ bus }: BusETAProps) {
           <div className="relative border-l-2 border-blue-200 ml-4 mt-2">
             {bus.daftar_eta.map((eta: any, index: number) => {
               const isTarget = eta.is_target; 
-              const etaMinutes = eta.eta_seconds ? Math.ceil(eta.eta_seconds / 60) : 0;
+              const etaMinutes = eta.eta_seconds ? Math.round(eta.eta_seconds / 60) : 0;
 
               return (
                 <div key={eta.halte_id || index} className="mb-6 ml-6 relative">
