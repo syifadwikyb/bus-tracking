@@ -124,10 +124,11 @@ export default function ProfilePage() {
                 <div className="w-full lg:w-1/3">
                     <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                         <div className="p-8 flex flex-col items-center text-center">
-                            {/* Avatar */}
-                            <div className="h-28 w-28 rounded-full bg-blue-50 border-4 border-white shadow-lg flex items-center justify-center mb-4 text-blue-600">
-                                <User className="h-12 w-12" />
-                            </div>
+                            <img
+                                src={"/assets/icons/Profile.svg"}
+                                alt="Profile"
+                                className="h-28 w-28"
+                            />
 
                             <h2 className="text-2xl font-bold text-gray-900">{user.username}</h2>
                             <div className="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">

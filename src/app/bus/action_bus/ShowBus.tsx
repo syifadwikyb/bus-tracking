@@ -13,8 +13,7 @@ export default function ShowBus({ id }: { id: string }) {
         async function fetchDetail() {
             try {
                 const res = await fetch(`${API_URL}/api/bus/${id}`);
-
-                // Cek error jika response bukan JSON (misal 404 HTML)
+                
                 if (!res.ok) throw new Error("Gagal mengambil data");
 
                 const json = await res.json();
@@ -36,8 +35,7 @@ export default function ShowBus({ id }: { id: string }) {
             <Header subtitle="Detail Data" title={`Detail Bus: ${data.plat_nomor}`} />
 
             <div className="p-6 bg-white rounded-2xl shadow-lg max-w-3xl mx-auto mt-4">
-                <div className="flex items-center gap-6 border-b pb-6">
-                    {/* FOTO BUS */}
+                <div className="flex items-center gap-6 border-b pb-6">                    
                     <div className="w-32 h-32 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0 border border-gray-200 shadow-sm">
                         {data.foto ? (
                             <img

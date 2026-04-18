@@ -20,12 +20,10 @@ export default function EditBus({ id }: { id: string }) {
         status: "",
     });
 
-    // State untuk Foto
-    const [currentFoto, setCurrentFoto] = useState<string | null>(null); // Foto lama dari server
-    const [newFotoFile, setNewFotoFile] = useState<File | null>(null);   // Foto baru yg dipilih user
-    const [fotoPreview, setFotoPreview] = useState<string | null>(null); // Preview lokal
+    const [currentFoto, setCurrentFoto] = useState<string | null>(null);
+    const [newFotoFile, setNewFotoFile] = useState<File | null>(null);
+    const [fotoPreview, setFotoPreview] = useState<string | null>(null);
 
-    // 1. Fetch Data Bus Lama
     useEffect(() => {
         async function fetchBus() {
             try {
@@ -65,13 +63,11 @@ export default function EditBus({ id }: { id: string }) {
         if (id) fetchBus();
     }, [id, router]);
 
-    // Handle Input Teks
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     }
 
-    // Handle Input File
     function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
         if (file) {
@@ -80,7 +76,6 @@ export default function EditBus({ id }: { id: string }) {
         }
     }
 
-    // 2. Submit Update
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setLoading(true);
@@ -90,7 +85,7 @@ export default function EditBus({ id }: { id: string }) {
             payload.append("kode_bus", formData.kode_bus);
             payload.append("plat_nomor", formData.plat_nomor);
             payload.append("kapasitas", formData.kapasitas);
-            payload.append("jenis_bus", formData.jenis_bus);    
+            payload.append("jenis_bus", formData.jenis_bus);
 
             if (newFotoFile) {
                 payload.append("foto", newFotoFile);
@@ -111,7 +106,7 @@ export default function EditBus({ id }: { id: string }) {
                     if (errorJson.message) {
                         errorMessage = errorJson.message;
                     }
-                } catch (parseError) {                 
+                } catch (parseError) {
                     errorMessage = `Server Error (${response.status}): Cek Console untuk detail.`;
                 }
                 throw new Error(errorMessage);
@@ -159,7 +154,6 @@ export default function EditBus({ id }: { id: string }) {
 
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    {/* --- KOLOM KIRI (Input) --- */}
                     <div className="space-y-4">
                         <div>
                             <label className="block font-medium mb-1">Kode Bus</label>
@@ -178,7 +172,6 @@ export default function EditBus({ id }: { id: string }) {
                             <input type="number" name="kapasitas" value={formData.kapasitas} onChange={handleChange} className="w-full border border-blue-400 rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
                         </div>
 
-                        {/* Input Foto */}
                         <div>
                             <label className="block font-medium mb-1">Update Foto (Opsional)</label>
                             <input
@@ -191,12 +184,10 @@ export default function EditBus({ id }: { id: string }) {
                         </div>
                     </div>
 
-                    {/* --- KOLOM KANAN (PREVIEW) --- */}
                     <div className="space-y-4">
                         <div className="flex flex-col items-center border border-blue-300 rounded-xl p-6 h-full bg-gray-50">
                             <h3 className="text-lg font-semibold text-gray-700 mb-4">Preview Edit</h3>
 
-                            {/* Logic Display Foto: Preview Baru > Foto Lama > Placeholder */}
                             <div className="mb-4 w-full flex justify-center">
                                 {fotoPreview ? (
                                     <img src={fotoPreview} alt="Preview Baru" className="w-64 h-40 object-cover rounded-lg shadow-sm border border-green-200" />
@@ -230,7 +221,6 @@ export default function EditBus({ id }: { id: string }) {
                         </div>
                     </div>
 
-                    {/* TOMBOL */}
                     <div className="col-span-1 md:col-span-2 flex justify-end space-x-3 mt-4 pt-4 border-t">
                         <Link href="/bus" className="bg-red-100 text-red-600 px-6 py-2 rounded-xl font-medium hover:bg-red-200">Batal</Link>
                         <button type="submit" disabled={loading} className="bg-teal-100 text-teal-700 px-6 py-2 rounded-xl font-medium hover:bg-teal-200">

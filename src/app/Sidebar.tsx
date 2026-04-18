@@ -13,8 +13,8 @@ import {
     Users,
     Wrench,
     LogOut,
-    UserCircle,
-    X // ✅ Import icon X untuk tombol close
+    BarChart,    
+    X
 } from "lucide-react";
 import { useEffect, useState } from 'react';
 
@@ -122,6 +122,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                         <NavLink href="/route" icon={Map} onClick={onClose}>Rute</NavLink>
                         <NavLink href="/bus_stop" icon={MapPin} onClick={onClose}>Halte</NavLink>
                         <NavLink href="/maintenance" icon={Wrench} onClick={onClose}>Perawatan</NavLink>
+                        <NavLink href="/analytics" icon={BarChart} onClick={onClose}>Analitik</NavLink>
                     </nav>
                 </div>
 
