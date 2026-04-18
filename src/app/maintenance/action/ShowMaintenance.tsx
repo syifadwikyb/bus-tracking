@@ -2,9 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { API_URL } from "@/lib/config";
 import Link from 'next/link';
 import Header from "@/components/Header";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Fungsi format tanggal (sama seperti Edit)
 const formatDateForInput = (dateString: string | null | undefined) => {

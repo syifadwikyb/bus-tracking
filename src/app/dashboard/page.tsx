@@ -8,7 +8,8 @@ import { BusFront, CircleOff, Wrench, CalendarClock } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import type { Bus, Stats } from './DashboardClient';
 import Header from '@/components/Header';
-import { API_URL } from '@/lib/config';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // --- TIPE DATA ---
 interface ApiBus {

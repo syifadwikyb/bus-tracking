@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { API_URL } from '@/lib/config';
 import {
     User,
     Shield,
@@ -13,6 +12,8 @@ import {
     AlertCircle,
     CheckCircle2
 } from 'lucide-react';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 import Header from '@/components/Header';
 
 export default function ProfilePage() {

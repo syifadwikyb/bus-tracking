@@ -1,5 +1,6 @@
 import { io } from "socket.io-client";
-import { API_URL } from "./config";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const socket = io(API_URL, {
   autoConnect: false,

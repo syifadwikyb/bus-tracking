@@ -2,11 +2,12 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { API_URL } from "@/lib/config";
 import Link from 'next/link';
 import Header from "@/components/Header";
 import dynamic from 'next/dynamic';
 import Swal from "sweetalert2";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Import Map secara dinamis (PENTING untuk Next.js)
 const RouteMap = dynamic(() => import('../components/RouteMap'), { ssr: false });

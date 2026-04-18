@@ -171,8 +171,7 @@ export default function MapView({
       !isNaN(Number(b.longitude))
   );
 
-  // Default Center (Kudus) - Tidak akan berubah-ubah mengikuti bus
-  const defaultCenter: [number, number] = [-6.805, 110.84];
+  const defaultCenter: [number, number] = [-7.015, 110.41];
 
   return (
     <div className="h-full w-full rounded-xl overflow-hidden">

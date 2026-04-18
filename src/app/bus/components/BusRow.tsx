@@ -1,10 +1,8 @@
 'use client';
 
 import { Eye, Pencil, Trash2 } from 'lucide-react';
-// Impor komponen global (pastikan path ini benar)
 import ActionButton from '@/components/ActionButton';
 
-// Tipe data Bus (harus sama dengan yang ada di BusTable)
 interface Bus {
     id_bus: number;
     kode_bus: string;

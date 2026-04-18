@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { API_URL } from '@/lib/config';
 import Header from '@/components/Header';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function AnalyticsPage() {
     const [type, setType] = useState("1day");

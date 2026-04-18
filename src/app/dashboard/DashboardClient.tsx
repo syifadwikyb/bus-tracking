@@ -96,7 +96,7 @@ export default function DashboardClient({
               }}
               className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
             >
-              <option value="">Semua Rute</option>
+              <option value="">Pilih Rute Aktif</option>
               {/* TAMBAHKAN FILTER DI SINI */}
               {routes
                 .filter(route => route.status?.toLowerCase() === 'berjalan') // Sesuaikan 'aktif' dengan data dari backend

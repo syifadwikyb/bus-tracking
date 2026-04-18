@@ -7,8 +7,9 @@ import SearchBar from '@/components/SearchBar';
 import AddButton from '@/components/AddButton';
 import FilterDropdown from '@/components/FilterDropdown';
 import Pagination from '@/components/Pagination';
-import { API_URL } from '@/lib/config';
 import Swal from 'sweetalert2';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface Maintenance {
   id_maintenance: number;

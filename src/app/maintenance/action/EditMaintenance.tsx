@@ -2,10 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { API_URL } from "@/lib/config";
 import Link from 'next/link';
 import Header from "@/components/Header";
 import Swal from 'sweetalert2';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Fungsi untuk memformat tanggal YYYY-MM-DD
 const formatDateForInput = (dateString: string | null | undefined) => {

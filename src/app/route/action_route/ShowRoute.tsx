@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { API_URL } from "@/lib/config";
 import Link from 'next/link';
 import Header from "@/components/Header";
 import dynamic from 'next/dynamic';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const RouteMap = dynamic(() => import('../components/RouteMap'), { ssr: false });
 

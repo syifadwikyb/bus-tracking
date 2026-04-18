@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type Bus } from "../DashboardClient"; // Sesuaikan path ini jika berbeda
-import { API_URL } from '@/lib/config';
+import { type Bus } from "../DashboardClient";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 
 type BusDetailProps = {
   bus: Bus | null;

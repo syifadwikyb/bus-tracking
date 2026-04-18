@@ -1,10 +1,10 @@
 "use client";
 
-import { API_URL } from '@/lib/config';
-
 interface DriverInfoProps {
   bus: any;
 }
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function DriverInfo({ bus }: DriverInfoProps) {
   // const nama = bus?.nama_driver || bus?.nama || '-';

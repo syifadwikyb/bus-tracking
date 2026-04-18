@@ -11,7 +11,6 @@ import {
   Legend
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
-import { API_URL } from '@/lib/config';
 
 ChartJS.register(
   CategoryScale,
@@ -28,6 +27,8 @@ interface UtilizationData {
   total_logs: number;
   active_minutes: number;
 }
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function BusChart() {
   const [chartData, setChartData] = useState<UtilizationData[]>([]);
