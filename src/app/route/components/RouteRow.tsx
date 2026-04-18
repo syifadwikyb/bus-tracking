@@ -3,13 +3,12 @@
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import ActionButton from '@/components/ActionButton';
 
-// ✅ Definisi Route diseragamkan
 export interface Route {
     id_jalur: number;
     kode_jalur: string;
     nama_jalur: string;
-    rute_polyline?: string; // Opsional
-    status: string;         // String umum
+    rute_polyline?: string;
+    status: string;
 }
 
 interface RouteRowProps {
@@ -29,7 +28,6 @@ function formatPolyline(poly: string | null | undefined): string {
 }
 
 const StatusBadge = ({ status }: { status: string | null | undefined }) => {
-    // Normalisasi status untuk handle huruf besar/kecil
     const normalizedStatus = status ? status.toLowerCase().trim() : '';
 
     let statusText = status || 'N/A';
@@ -51,7 +49,6 @@ const StatusBadge = ({ status }: { status: string | null | undefined }) => {
 };
 
 export default function RouteRow({ route, onShow, onEdit, onDelete }: RouteRowProps) {
-    // Ambil data polyline dengan aman
     const polylineData = route.rute_polyline;
 
     return (

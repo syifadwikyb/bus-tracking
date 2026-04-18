@@ -43,7 +43,6 @@ export default function MaintenanceTable() {
     router.push(`/maintenance/action?mode=edit&id=${item.id_maintenance}`);
   };
 
-  // SWEETALERT UNTUK DELETE
   const handleDelete = async (item: Maintenance) => {
     const result = await Swal.fire({
       title: 'Apakah Anda yakin?',
@@ -85,7 +84,6 @@ export default function MaintenanceTable() {
     }
   };
 
-  // FITUR PRINT LAPORAN
   const handlePrint = async () => {
     const { value: formValues } = await Swal.fire({
       title: 'Cetak Laporan Perawatan Bus',
@@ -114,7 +112,7 @@ export default function MaintenanceTable() {
       showCancelButton: true,
       confirmButtonText: 'Cetak',
       cancelButtonText: 'Batal',
-      confirmButtonColor: '#10B981', // Emerald/Green color
+      confirmButtonColor: '#10B981',
       preConfirm: () => {
         return {
           startDate: (document.getElementById('swal-start-date') as HTMLInputElement).value,
@@ -127,12 +125,10 @@ export default function MaintenanceTable() {
     if (formValues) {
       let dataToPrint = allData;
 
-      // Filter berdasarkan status jika ada
       if (formValues.status) {
         dataToPrint = dataToPrint.filter(d => d.status.toLowerCase() === formValues.status.toLowerCase());
       }
 
-      // Filter berdasarkan rentang tanggal perbaikan jika diisi
       if (formValues.startDate && formValues.endDate) {
         dataToPrint = dataToPrint.filter(d => {
           const maintenanceDate = new Date(d.tanggal_perbaikan);
@@ -142,7 +138,6 @@ export default function MaintenanceTable() {
         });
       }
 
-      // Format HTML untuk dicetak
       const printWindow = window.open('', '_blank');
       if (!printWindow) return;
 
@@ -199,9 +194,7 @@ export default function MaintenanceTable() {
           </table>
           <script>
             window.onload = function() {
-              window.print();
-              // Opsional: window.close() dapat dipanggil jika ingin tab otomatis tutup setelah dialog print ditutup
-              // window.onafterprint = function() { window.close(); } 
+              window.print();                            
             }
           </script>
         </body>
@@ -289,7 +282,6 @@ export default function MaintenanceTable() {
         </div>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="text-center min-w-full divide-y divide-blue-200">
           <thead className="bg-blue-50">

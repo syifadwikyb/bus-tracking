@@ -15,12 +15,10 @@ export default function SessionGuard({
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const lastActivityRef = useRef<number>(Date.now());
 
-  // Fungsi Logout
   const doLogout = useCallback(() => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      // Hapus cookie dengan setting expired date ke masa lalu
       document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
 
       alert('Sesi Anda telah berakhir karena tidak aktif.');

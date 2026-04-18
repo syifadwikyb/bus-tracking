@@ -7,7 +7,6 @@ interface DriverInfoProps {
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function DriverInfo({ bus }: DriverInfoProps) {
-  // const nama = bus?.nama_driver || bus?.nama || '-';
   const nama = bus?.nama_driver ||
     bus?.nama ||
     bus?.jadwal?.[0]?.driver?.nama ||
@@ -17,7 +16,6 @@ export default function DriverInfo({ bus }: DriverInfoProps) {
 
   const fotoFileName = bus?.driver_foto;
 
-  // 3. Bentuk URL
   const urlFoto = fotoFileName
     ? `${API_URL}/uploads/${fotoFileName}`
     : "/assets/icons/Profile.svg";
@@ -25,15 +23,13 @@ export default function DriverInfo({ bus }: DriverInfoProps) {
   console.log("Driver dari jadwal:", bus?.jadwal?.[0]?.driver);
   console.log(bus);
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 flex items-center space-x-4">
-      {/* Container Gambar */}
+    <div className="bg-white rounded-lg shadow-md p-4 flex items-center space-x-4">      
       <div className="relative w-14 h-14 flex-shrink-0">
         <img
           src={urlFoto}
           alt={`Foto ${nama}`}
           className="w-full h-full rounded-full object-cover border border-gray-200"
           onError={(e) => {
-            // Jika link rusak, baru ganti ke default
             e.currentTarget.src = "/assets/icons/Profile.svg";
           }}
         />

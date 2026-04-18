@@ -42,8 +42,7 @@ export default function ShowRoute({ id }: { id: string }) {
             <Header subtitle="Detail Rute" title={`Jalur: ${data.nama_jalur}`} />
 
             <div className="p-6 bg-white rounded-2xl shadow-lg mt-4">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Info Text */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">                    
                     <div className="lg:col-span-1 space-y-6">
                         <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
                             <p className="text-sm text-gray-500">Kode Jalur</p>
@@ -66,8 +65,7 @@ export default function ShowRoute({ id }: { id: string }) {
                             </Link>
                         </div>
                     </div>
-
-                    {/* Static Map */}
+                    
                     <div className="lg:col-span-2 h-[400px] border border-gray-300 rounded-xl overflow-hidden relative">
                         <RouteMap points={points} readOnly={true} />
                         <div className="absolute bottom-2 right-2 bg-white/80 px-2 py-1 rounded text-xs z-[1000]">

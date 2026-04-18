@@ -3,7 +3,6 @@
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import ActionButton from '@/components/ActionButton';
 
-// Tipe data Driver
 interface Driver {
     id_driver: number;
     kode_driver: string;
@@ -20,7 +19,6 @@ interface DriverRowProps {
     onDelete: (driver: Driver) => void;
 }
 
-// Fungsi helper untuk memformat tanggal
 function formatDate(dateString: string) {
     try {
         const date = new Date(dateString);
@@ -36,12 +34,10 @@ function formatDate(dateString: string) {
     }
 }
 
-// Komponen Badge Status
 const StatusBadge = ({ status }: { status: Driver['status'] }) => {
     let statusText: string;
     let statusClass: string;
 
-    // Default-kan status null/undefined ke 'berhenti'
     const normalizedStatus = (status || 'berhenti').toLowerCase();
 
     switch (normalizedStatus) {
@@ -69,7 +65,6 @@ const StatusBadge = ({ status }: { status: Driver['status'] }) => {
     );
 };
 
-// Komponen utama baris tabel
 export default function DriverRow({ driver, onShow, onEdit, onDelete }: DriverRowProps) {
     return (
         <tr className="hover:bg-gray-50 transition-colors">

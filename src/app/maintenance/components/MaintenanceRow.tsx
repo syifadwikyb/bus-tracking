@@ -3,7 +3,6 @@
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import ActionButton from '@/components/ActionButton';
 
-// Tipe data Maintenance
 interface Maintenance {
     id_maintenance: number;
     bus_id: number;
@@ -25,7 +24,6 @@ interface MaintenanceRowProps {
     onDelete: (maintenance: Maintenance) => void;
 }
 
-// Format tanggal Indonesia
 function formatDate(dateString: string) {
     try {
         const date = new Date(dateString);
@@ -41,7 +39,6 @@ function formatDate(dateString: string) {
     }
 }
 
-// Badge Status Maintenance
 const StatusBadge = ({ status }: { status: Maintenance['status'] }) => {
     let statusText: string;
     let statusClass: string;
@@ -78,7 +75,6 @@ const StatusBadge = ({ status }: { status: Maintenance['status'] }) => {
 };
 
 
-// Baris Tabel Maintenance
 export default function MaintenanceRow({
     maintenance,
     onShow,

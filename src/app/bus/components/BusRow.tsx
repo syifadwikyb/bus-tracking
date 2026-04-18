@@ -19,28 +19,23 @@ interface BusRowProps {
     onDelete: (bus: Bus) => void;
 }
 
-// Komponen Badge Status
-// BusRow.tsx
-
 const StatusBadge = ({ status }: { status: Bus['status'] }) => {
-    // Normalisasi string (jaga-jaga kalau ada huruf besar dari DB lama)
     const normalizedStatus = status ? status.toLowerCase() : '';
 
     let statusText = '';
     let statusClass = '';
 
     if (normalizedStatus === 'berjalan') {
-        statusText = 'Berjalan'; // Running
+        statusText = 'Berjalan';
         statusClass = 'bg-green-100 text-green-700 border border-green-200';
     } else if (normalizedStatus === 'dijadwalkan') {
-        statusText = 'Dijadwalkan'; // Scheduled
+        statusText = 'Dijadwalkan';
         statusClass = 'bg-blue-100 text-blue-700 border border-blue-200';
     } else if (normalizedStatus === 'dalam perbaikan') {
-        statusText = 'Perbaikan'; // Maintenance
+        statusText = 'Perbaikan';
         statusClass = 'bg-yellow-100 text-yellow-800 border border-yellow-200';
     } else {
-        // Default ke Berhenti untuk semua status lain
-        statusText = 'Berhenti'; // Stopped
+        statusText = 'Berhenti';
         statusClass = 'bg-red-100 text-red-600 border border-red-200';
     }
 
@@ -51,7 +46,6 @@ const StatusBadge = ({ status }: { status: Bus['status'] }) => {
     );
 };
 
-// Komponen Baris Tabel
 export default function BusRow({ bus, onShow, onEdit, onDelete }: BusRowProps) {
     return (
         <tr className="hover:bg-gray-50 transition-colors">
@@ -68,7 +62,6 @@ export default function BusRow({ bus, onShow, onEdit, onDelete }: BusRowProps) {
                 <StatusBadge status={bus.status} />
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                {/* Tombol Aksi */}
                 <div className="flex items-center space-x-2 justify-center">
                     <ActionButton
                         color="green"
@@ -93,4 +86,3 @@ export default function BusRow({ bus, onShow, onEdit, onDelete }: BusRowProps) {
         </tr>
     );
 }
-

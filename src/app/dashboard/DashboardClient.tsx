@@ -1,6 +1,5 @@
 'use client';
-
-import { useMemo } from 'react'; // Import useMemo
+import { useMemo } from 'react';
 import MapView from './components/MapView';
 import BusTable from './components/BusTable';
 import DriverInfo from './components/DriverInfo';
@@ -82,12 +81,11 @@ export default function DashboardClient({
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       <div className="lg:col-span-2 flex flex-col gap-6">
-        
-        {/* MAP SECTION */}
+
         <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-800">Peta Tracking Real-time</h3>
-            
+
             <select
               onChange={(e) => {
                 const routeId = e.target.value ? parseInt(e.target.value) : null;
@@ -97,14 +95,13 @@ export default function DashboardClient({
               className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
             >
               <option value="">Pilih Rute Aktif</option>
-              {/* TAMBAHKAN FILTER DI SINI */}
               {routes
-                .filter(route => route.status?.toLowerCase() === 'berjalan') // Sesuaikan 'aktif' dengan data dari backend
+                .filter(route => route.status?.toLowerCase() === 'berjalan')
                 .map(route => (
                   <option key={route.id_jalur} value={route.id_jalur}>
                     {route.nama_jalur}
                   </option>
-              ))}
+                ))}
             </select>
           </div>
 
@@ -117,7 +114,6 @@ export default function DashboardClient({
           </div>
         </div>
 
-        {/* TABLE SECTION */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
           <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
             <h3 className="text-lg font-semibold text-gray-700">
@@ -128,7 +124,6 @@ export default function DashboardClient({
         </div>
       </div>
 
-      {/* DETAIL & CHART */}
       <div className="flex flex-col gap-6">
         <DriverInfo bus={displayedBus} />
         <BusDetail bus={displayedBus} />

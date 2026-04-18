@@ -33,8 +33,7 @@ export default function ShowDriver({ id }: { id: string }) {
             <Header subtitle="Detail Data" title={`Profil: ${data.nama}`} />
 
             <div className="p-6 bg-white rounded-2xl shadow-lg max-w-3xl mx-auto mt-4">
-                <div className="flex flex-col md:flex-row items-center gap-8 border-b pb-8">
-                    {/* FOTO PROFIL */}
+                <div className="flex flex-col md:flex-row items-center gap-8 border-b pb-8">                
                     <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-teal-50 shadow-lg flex-shrink-0">
                         {data.driver_foto ? (
                             <img src={`${API_URL}/uploads/${data.driver_foto}`} alt="Foto Driver" className="w-full h-full object-cover" />

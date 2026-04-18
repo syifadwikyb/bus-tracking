@@ -28,17 +28,14 @@ export default function EditBusStop({ id }: { id: string }) {
     useEffect(() => {
         async function fetchData() {
             try {
-                // 1. Fetch Detail Halte
                 const resHalte = await fetch(`${API_URL}/api/halte/${id}`);
                 const dataHalte = await resHalte.json();
                 const halte = dataHalte.data || dataHalte;
 
-                // 2. Fetch List Jalur
                 const resJalur = await fetch(`${API_URL}/api/jalur`);
                 const dataJalur = await resJalur.json();
                 setJalurs(Array.isArray(dataJalur) ? dataJalur : (dataJalur.data || []));
 
-                // 3. Set Form Data
                 setFormData({
                     nama_halte: halte.nama_halte || "",
                     jalur_id: halte.jalur_id?.toString() || "",
@@ -82,9 +79,9 @@ export default function EditBusStop({ id }: { id: string }) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
             });
-            
+
             const result = await response.json();
-            
+
             if (!response.ok) {
                 throw new Error(result.message || "Gagal update data");
             }

@@ -75,7 +75,6 @@ export default function ScheduleTable() {
     }
 
     async function handleDelete(s: Schedule) {
-        // 1. Tampilkan SweetAlert untuk Konfirmasi
         const result = await Swal.fire({
             title: 'Apakah Anda yakin?',
             text: `Hapus jadwal Bus ${s.bus.plat_nomor}? Tindakan ini tidak dapat dibatalkan!`,
@@ -87,7 +86,6 @@ export default function ScheduleTable() {
             cancelButtonText: 'Batal'
         });
 
-        // 2. Cek apakah user menekan tombol "Ya, hapus!"
         if (result.isConfirmed) {
             try {
                 const res = await fetch(`${API_URL}/api/schedules/${s.id_schedule}`, {
@@ -102,7 +100,6 @@ export default function ScheduleTable() {
                 setAllSchedules(allSchedules.filter(sc => sc.id_schedule !== s.id_schedule));
                 setFiltered(filtered.filter(sc => sc.id_schedule !== s.id_schedule));
 
-                // 3. SweetAlert Sukses
                 Swal.fire({
                     icon: 'success',
                     title: 'Dihapus!',
@@ -114,7 +111,6 @@ export default function ScheduleTable() {
             } catch (error: any) {
                 console.error('❌ Gagal menghapus:', error);
 
-                // 4. SweetAlert Error
                 Swal.fire({
                     icon: 'error',
                     title: 'Gagal!',

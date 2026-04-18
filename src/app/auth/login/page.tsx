@@ -50,8 +50,8 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="flex min-h-screen w-full bg-white">            
-            <div className="hidden lg:flex lg:w-1/2 relative bg-blue-600 flex-col justify-between p-12 overflow-hidden">                
+        <div className="flex min-h-screen w-full bg-white">
+            <div className="hidden lg:flex lg:w-1/2 relative bg-blue-600 flex-col justify-between p-12 overflow-hidden">
                 <div className="absolute inset-0 opacity-10">
                     <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
                         <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white" />
@@ -60,15 +60,17 @@ export default function LoginPage() {
                         <path d="M20 50 Q 50 10 80 30" stroke="white" strokeWidth="0.5" fill="none" />
                     </svg>
                 </div>
-                
+
                 <div className="absolute top-1/4 left-1/4 h-64 w-64 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse"></div>
                 <div className="absolute bottom-1/4 right-1/4 h-64 w-64 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse delay-700"></div>
-                
+
                 <div className="relative z-10">
                     <div className="flex items-center space-x-3">
-                        <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
-                            <Bus className="h-8 w-8 text-white" />
-                        </div>
+                        <img
+                            src={"/assets/icons/Profile.svg"}
+                            alt="Logo DipTrack"
+                            className="h-14 w-14 shadow-lg"
+                        />
                         <h1 className="text-2xl font-bold text-white tracking-wide">DipTrack</h1>
                     </div>
                 </div>
@@ -79,14 +81,14 @@ export default function LoginPage() {
                     </h2>
                     <p className="text-blue-100 text-lg">
                         Solusi manajemen transportasi cerdas untuk efisiensi jadwal, pemantauan rute, dan keselamatan penumpang.
-                    </p>                    
+                    </p>
                 </div>
 
                 <div className="relative z-10 text-blue-200 text-sm">
-                    © 2026 DipTrack Management System
+                    © 2026 DipTrack
                 </div>
             </div>
-            
+
             <div className="flex w-full lg:w-1/2 items-center justify-center p-8 bg-gray-50">
                 <div className="w-full max-w-md space-y-4 bg-white p-10 rounded-2xl shadow-xl border border-gray-100">
                     <div className="text-center lg:text-left">
@@ -142,7 +144,7 @@ export default function LoginPage() {
                                     />
                                 </div>
                             </div>
-                        </div>                    
+                        </div>
 
                         <button
                             type="submit"
@@ -157,7 +159,7 @@ export default function LoginPage() {
                                 </span>
                             )}
                         </button>
-                    </form>                   
+                    </form>
                 </div>
             </div>
         </div>

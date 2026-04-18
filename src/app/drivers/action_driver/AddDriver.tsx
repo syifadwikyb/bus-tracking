@@ -12,7 +12,6 @@ export default function AddDriver() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
 
-    // State Input Teks
     const [formData, setFormData] = useState({
         kode_driver: "",
         nama: "",
@@ -20,21 +19,18 @@ export default function AddDriver() {
         nomor_telepon: "",
     });
 
-    // State Foto
     const [fotoFile, setFotoFile] = useState<File | null>(null);
     const [fotoPreview, setFotoPreview] = useState<string | null>(null);
 
-    // Handle Input Teks
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     }
 
-    // Handle Upload Foto
     function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
         if (file) {
-            if (file.size > 2 * 1024 * 1024) { // Validasi 2MB
+            if (file.size > 2 * 1024 * 1024) {
                 alert("Ukuran file terlalu besar! Maksimal 2MB.");
                 e.target.value = "";
                 return;
@@ -44,7 +40,6 @@ export default function AddDriver() {
         }
     }
 
-    // Submit Data
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setLoading(true);
@@ -56,7 +51,6 @@ export default function AddDriver() {
             payload.append("tanggal_lahir", formData.tanggal_lahir);
             payload.append("nomor_telepon", formData.nomor_telepon);
 
-            // Status Default
             payload.append("status", "berhenti");
 
             if (fotoFile) {
@@ -65,7 +59,7 @@ export default function AddDriver() {
 
             const response = await fetch(`${API_URL}/api/drivers`, {
                 method: "POST",
-                body: payload, // FormData otomatis set Content-Type multipart
+                body: payload,
             });
 
             if (!response.ok) {
@@ -120,8 +114,7 @@ export default function AddDriver() {
                 </p>
 
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                    {/* --- KOLOM KIRI (INPUT) --- */}
+                    
                     <div className="space-y-4">
                         <div>
                             <label className="block font-medium mb-1">Kode Driver</label>
@@ -145,13 +138,11 @@ export default function AddDriver() {
                             <p className="text-xs text-gray-400 mt-1">*Format: JPG, PNG. Maks 2MB.</p>
                         </div>
                     </div>
-
-                    {/* --- KOLOM KANAN (PREVIEW) --- */}
+                    
                     <div className="space-y-4">
                         <div className="flex flex-col items-center border border-blue-300 rounded-xl p-6 h-full bg-gray-50">
                             <h3 className="text-lg font-semibold text-gray-700 mb-4">Preview Driver</h3>
-
-                            {/* Preview Foto */}
+                            
                             <div className="mb-4">
                                 {fotoPreview ? (
                                     <img src={fotoPreview} alt="Preview" className="w-32 h-32 object-cover rounded-full shadow-md border-4 border-white" />
@@ -183,8 +174,7 @@ export default function AddDriver() {
                             </div>
                         </div>
                     </div>
-
-                    {/* --- TOMBOL AKSI --- */}
+                    
                     <div className="col-span-1 md:col-span-2 flex justify-end space-x-3 mt-4 pt-4 border-t">
                         <Link href="/drivers" className="bg-red-100 text-red-600 px-6 py-2 rounded-xl font-medium hover:bg-red-200">Batal</Link>
                         <button type="submit" disabled={loading} className={`px-6 py-2 rounded-xl font-medium text-teal-700 transition ${loading ? "bg-teal-50 cursor-not-allowed" : "bg-teal-100 hover:bg-teal-200"}`}>

@@ -3,7 +3,6 @@
 import { Filter } from 'lucide-react';
 import { useState } from 'react';
 
-// Tipe untuk satu set filter
 type FilterSet = {
     label: string;
     options: string[];
@@ -15,13 +14,11 @@ interface FilterDropdownProps {
     filters: FilterSet[];
 }
 
-// Tombol filter dan modal/dropdown
 export default function FilterDropdown({ filters }: FilterDropdownProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
         <div className="relative">
-            {/* Tombol Filter */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="p-2 border border-gray-300 rounded-lg text-gray-700 shadow-sm hover:bg-gray-50 transition-all"
@@ -30,11 +27,10 @@ export default function FilterDropdown({ filters }: FilterDropdownProps) {
                 <Filter size={20} />
             </button>
 
-            {/* Dropdown Konten */}
             {isOpen && (
                 <div
                     className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl z-50 border border-gray-200"
-                    onClick={(e) => e.stopPropagation()} // Mencegah penutupan saat diklik
+                    onClick={(e) => e.stopPropagation()}
                 >
                     <div className="p-4 border-b">
                         <h3 className="text-lg font-semibold text-gray-900">Filter</h3>
@@ -73,7 +69,6 @@ export default function FilterDropdown({ filters }: FilterDropdownProps) {
                     </form>
                 </div>
             )}
-            {/* Overlay untuk menutup modal saat diklik di luar */}
             {isOpen && (
                 <div
                     className="fixed inset-0 z-40"

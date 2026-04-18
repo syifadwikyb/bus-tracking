@@ -3,7 +3,6 @@ import Header from '@/components/Header';
 import MaintenanceTable from './components/MaintenanceTable';
 import { useEffect, useState } from 'react';
 
-// Ini adalah halaman utama untuk '/bus_stop/drivers'
 export default function DriverManagementPage() {
   const [greeting, setGreeting] = useState("");
 

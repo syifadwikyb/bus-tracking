@@ -1,11 +1,10 @@
 'use client';
 
-// Komponen tombol aksi (View, Edit, Delete)
 interface ActionButtonProps {
     color: 'green' | 'yellow' | 'red';
     icon: React.ReactNode;
     onClick: () => void;
-    title?: string; // Teks untuk 'tooltip' saat di-hover
+    title?: string;
 }
 
 export default function ActionButton({ color, icon, onClick, title }: ActionButtonProps) {

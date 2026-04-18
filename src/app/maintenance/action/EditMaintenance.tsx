@@ -8,18 +8,16 @@ import Swal from 'sweetalert2';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Fungsi untuk memformat tanggal YYYY-MM-DD
 const formatDateForInput = (dateString: string | null | undefined) => {
     if (!dateString) return "";
     try {
         const date = new Date(dateString);
-        return date.toISOString().split('T')[0]; // "YYYY-MM-DD"
+        return date.toISOString().split('T')[0];
     } catch {
         return "";
     }
 };
 
-// Asumsi Tipe Maintenance
 interface Maintenance {
     id_maintenance: number;
     bus_id: number;
@@ -52,7 +50,6 @@ const EditMaintenance: React.FC<{ id: string }> = ({ id }) => {
         status: "dijadwalkan",
     });
 
-    // 🔹 1. Ambil data bus (sama seperti Add)
     useEffect(() => {
         const fetchBuses = async () => {
             try {
@@ -68,7 +65,6 @@ const EditMaintenance: React.FC<{ id: string }> = ({ id }) => {
         fetchBuses();
     }, []);
 
-    // 🔹 2. Ambil data maintenance yang ada
     useEffect(() => {
         if (!id) return;
         const fetchMaintenanceData = async () => {
@@ -79,7 +75,6 @@ const EditMaintenance: React.FC<{ id: string }> = ({ id }) => {
 
                 const data: Maintenance = await res.json();
 
-                // Isi form dengan data yang ada
                 setFormData({
                     busId: data.bus_id.toString(),
                     tanggalMulai: formatDateForInput(data.tanggal_perbaikan),
@@ -101,7 +96,6 @@ const EditMaintenance: React.FC<{ id: string }> = ({ id }) => {
         fetchMaintenanceData();
     }, [id, router]);
 
-    // 🔹 3. Update 'selectedBus' jika busId berubah (dari fetch) atau bus list selesai loading
     useEffect(() => {
         if (formData.busId && buses.length > 0) {
             const bus = buses.find((b) => b.id_bus.toString() === formData.busId);
@@ -122,7 +116,6 @@ const EditMaintenance: React.FC<{ id: string }> = ({ id }) => {
         }
     };
 
-    // 🔹 4. Submit form (PUT request)
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -207,7 +200,6 @@ const EditMaintenance: React.FC<{ id: string }> = ({ id }) => {
                     onSubmit={handleSubmit}
                     className="grid grid-cols-1 md:grid-cols-2 gap-6"
                 >
-                    {/* Kolom kiri (Form) */}
                     <div className="space-y-4">
                         <div>
                             <label className="block font-medium mb-1">Nomor Polisi</label>
@@ -263,7 +255,6 @@ const EditMaintenance: React.FC<{ id: string }> = ({ id }) => {
                         </div>
                     </div>
 
-                    {/* Kolom kanan (Preview & Biaya) */}
                     <div className="space-y-4">
                         <div className="flex flex-col items-center border border-blue-300 rounded-xl p-3">
                             {selectedBus?.foto ? (
@@ -313,7 +304,6 @@ const EditMaintenance: React.FC<{ id: string }> = ({ id }) => {
                         </div>
                     </div>
 
-                    {/* Tombol Aksi */}
                     <div className="col-span-2 flex justify-end space-x-3 mt-4">
                         <Link
                             href="/maintenance"

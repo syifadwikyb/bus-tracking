@@ -9,21 +9,18 @@ import Swal from "sweetalert2";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Import Map secara dinamis (PENTING untuk Next.js)
 const RouteMap = dynamic(() => import('../components/RouteMap'), { ssr: false });
 
 export default function AddRoute() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
 
-    // State Form
     const [formData, setFormData] = useState({
         kode_jalur: "",
         nama_jalur: "",
         status: "aktif",
     });
 
-    // State Koordinat Polyline
     const [points, setPoints] = useState<[number, number][]>([]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -31,7 +28,7 @@ export default function AddRoute() {
     };
 
     const handleResetMap = () => {
-        setPoints([]); // Hapus semua titik
+        setPoints([]);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -56,12 +53,11 @@ export default function AddRoute() {
             const payload = {
                 kode_jalur: formData.kode_jalur,
                 nama_jalur: formData.nama_jalur,
-                // 👇 PERBAIKAN PENTING: Sesuaikan dengan ENUM Database (berjalan/berhenti)
                 status: formData.status === 'aktif' ? 'berjalan' : 'berhenti',
                 rute_polyline: polylineString,
             };
 
-            console.log("🚀 Sending Payload:", payload); // Cek di Console
+            console.log("🚀 Sending Payload:", payload);
 
             const response = await fetch(`${API_URL}/api/jalur`, {
                 method: "POST",
@@ -69,11 +65,9 @@ export default function AddRoute() {
                 body: JSON.stringify(payload),
             });
 
-            // 👇 PERBAIKAN DEBUGGING: Baca pesan error dari server
             const result = await response.json().catch(() => null);
 
             if (!response.ok) {
-                // Tampilkan pesan spesifik dari backend (misal: "Kode jalur sudah ada")
                 throw new Error(result?.message || `Gagal menyimpan rute (${response.status})`);
             }
 
@@ -115,7 +109,6 @@ export default function AddRoute() {
 
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                    {/* KOLOM KIRI (Input Data) */}
                     <div className="lg:col-span-1 space-y-4">
                         <div>
                             <label className="block font-medium mb-1">Kode Jalur</label>
@@ -153,17 +146,13 @@ export default function AddRoute() {
                         </div>
                     </div>
 
-                    {/* KOLOM KANAN (MAPS INTERAKTIF) */}
                     <div className="lg:col-span-2 h-[500px] border border-gray-300 rounded-xl overflow-hidden relative shadow-inner">
-                        {/* Panggil komponen Map */}
                         <RouteMap points={points} setPoints={setPoints} />
 
-                        {/* Indikator Total Titik */}
                         <div className="absolute top-2 right-2 bg-white px-3 py-1 rounded-md shadow z-[1000] text-xs font-bold text-gray-700">
                             Total Titik: {points.length}
                         </div>
 
-                        {/* Overlay Instruksi jika belum ada titik yang dipilih */}
                         {points.length === 0 && (
                             <div className="absolute inset-0 bg-black/10 flex items-center justify-center z-[1000] pointer-events-none">
                                 <div className="bg-white/90 px-4 py-2 rounded-full shadow-lg text-sm font-bold text-gray-700 animate-bounce">

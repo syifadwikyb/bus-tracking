@@ -8,7 +8,6 @@ import Swal from 'sweetalert2';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Interface tipe data
 interface Bus {
     id_bus: number;
     plat_nomor: string;
@@ -33,12 +32,10 @@ export default function AddSchedule() {
     const [loading, setLoading] = useState(false);
     const [loadingData, setLoadingData] = useState(true);
 
-    // State untuk Data List
     const [buses, setBuses] = useState<Bus[]>([]);
     const [drivers, setDrivers] = useState<Driver[]>([]);
     const [jalurs, setJalurs] = useState<Jalur[]>([]);
 
-    // State untuk Preview
     const [selectedBus, setSelectedBus] = useState<Bus | null>(null);
     const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
     const [selectedJalur, setSelectedJalur] = useState<Jalur | null>(null);
@@ -52,11 +49,9 @@ export default function AddSchedule() {
         jamSelesai: "",
     });
 
-    // 🔹 Ambil data Bus, Driver, dan Jalur
     useEffect(() => {
         async function fetchData() {
             try {
-                // 1. Fetch Bus
                 const busRes = await fetch(`${API_URL}/api/bus`);
                 const busDataRaw = await busRes.json();
                 const busList = Array.isArray(busDataRaw) ? busDataRaw : (busDataRaw.data || []);
@@ -65,7 +60,6 @@ export default function AddSchedule() {
                 );
                 setBuses(availableBuses);
 
-                // 2. Fetch Driver
                 const driverRes = await fetch(`${API_URL}/api/drivers`);
                 const driverDataRaw = await driverRes.json();
                 const driverList = Array.isArray(driverDataRaw) ? driverDataRaw : (driverDataRaw.data || []);
@@ -74,7 +68,6 @@ export default function AddSchedule() {
                 );
                 setDrivers(availableDrivers);
 
-                // 3. Fetch Jalur
                 const jalurRes = await fetch(`${API_URL}/api/jalur`);
                 const jalurDataRaw = await jalurRes.json();
                 const jalurList = Array.isArray(jalurDataRaw) ? jalurDataRaw : (jalurDataRaw.data || []);
@@ -93,12 +86,10 @@ export default function AddSchedule() {
         fetchData();
     }, []);
 
-    // 🔹 Handle input change
     function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
 
-        // Update Preview
         if (name === "busId") {
             const bus = buses.find((b) => b.id_bus.toString() === value);
             setSelectedBus(bus || null);
@@ -113,11 +104,9 @@ export default function AddSchedule() {
         }
     }
 
-    // 🔹 Submit form
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
-        // Validasi
         if (!formData.busId || !formData.driverId || !formData.jalurId) {
             alert("⚠️ Harap pilih Bus, Driver, dan Jalur!");
             return;
@@ -168,7 +157,6 @@ export default function AddSchedule() {
         }
     }
 
-    // 🔹 Reset form
     function handleReset() {
         setFormData({
             busId: "",
@@ -199,7 +187,6 @@ export default function AddSchedule() {
             />
 
             <div className="p-6 bg-white rounded-2xl shadow-md">
-                {/* Breadcrumb */}
                 <p className="text-sm text-gray-500 mb-6" aria-label="breadcrumb">
                     <Link href="/schedule"
                         className="hover:text-blue-600 hover:underline transition-colors">
@@ -213,10 +200,8 @@ export default function AddSchedule() {
 
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    {/* --- KOLOM KIRI (Form Input) --- */}
                     <div className="space-y-4">
 
-                        {/* Pilih Bus */}
                         <div>
                             <label className="block font-medium mb-1">Pilih Bus</label>
                             {loadingData ? (
@@ -239,7 +224,6 @@ export default function AddSchedule() {
                             )}
                         </div>
 
-                        {/* Pilih Driver */}
                         <div>
                             <label className="block font-medium mb-1">Pilih Driver</label>
                             {loadingData ? (
@@ -262,7 +246,6 @@ export default function AddSchedule() {
                             )}
                         </div>
 
-                        {/* Pilih Jalur */}
                         <div>
                             <label className="block font-medium mb-1">Pilih Jalur (Rute)</label>
                             {loadingData ? (
@@ -285,7 +268,6 @@ export default function AddSchedule() {
                             )}
                         </div>
 
-                        {/* Tanggal */}
                         <div>
                             <label className="block font-medium mb-1">Tanggal Keberangkatan</label>
                             <input
@@ -298,7 +280,6 @@ export default function AddSchedule() {
                             />
                         </div>
 
-                        {/* Jam Mulai & Selesai */}
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block font-medium mb-1">Jam Mulai</label>
@@ -324,16 +305,13 @@ export default function AddSchedule() {
                             </div>
                         </div>
 
-                        {/* ❌ Input Status DIHAPUS karena otomatis */}
                     </div>
 
-                    {/* --- KOLOM KANAN (Preview) --- */}
                     <div className="space-y-4">
                         <div className="flex flex-col items-center border border-blue-300 rounded-xl p-6 h-full bg-gray-50">
 
                             <h3 className="text-lg font-semibold text-gray-700 mb-4">Preview Jadwal</h3>
 
-                            {/* Foto Bus */}
                             <div className="mb-4">
                                 {selectedBus?.foto ? (
                                     <img
@@ -348,7 +326,6 @@ export default function AddSchedule() {
                                 )}
                             </div>
 
-                            {/* Info Detail Preview */}
                             <div className="w-full space-y-3 px-4">
                                 <div className="flex justify-between border-b pb-2">
                                     <span className="text-gray-500">Bus:</span>
@@ -386,7 +363,6 @@ export default function AddSchedule() {
                         </div>
                     </div>
 
-                    {/* --- TOMBOL AKSI --- */}
                     <div className="col-span-1 md:col-span-2 flex justify-end space-x-3 mt-4 pt-4 border-t">
                         <button
                             type="button"

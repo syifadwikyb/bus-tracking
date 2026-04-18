@@ -39,10 +39,8 @@ export default function AddBusStop() {
                 if (!res.ok) throw new Error("Gagal fetch jalur");
                 const data = await res.json();
 
-                // Normalisasi data
                 const allJalurs = Array.isArray(data) ? data : (data.data || []);
 
-                // 🔥 FILTER HANYA YANG BERJALAN/AKTIF
                 const activeJalurs = allJalurs.filter((j: Jalur) =>
                     j.status.toLowerCase() === 'berjalan' || j.status.toLowerCase() === 'aktif'
                 );
@@ -73,19 +71,17 @@ export default function AddBusStop() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validasi Lokasi Peta
         if (!formData.latitude || !formData.longitude) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Lokasi Belum Dipilih!',
                 text: 'Harap KLIK PETA untuk menentukan lokasi Halte!',
                 confirmButtonText: 'OK',
-                confirmButtonColor: '#3B82F6' // Warna biru standar untuk tombol OK
+                confirmButtonColor: '#3B82F6'
             });
             return;
         }
 
-        // Validasi Jalur
         if (!formData.jalur_id) {
             Swal.fire({
                 icon: 'warning',
@@ -97,7 +93,6 @@ export default function AddBusStop() {
             return;
         }
 
-        // Validasi Urutan
         if (!formData.urutan) {
             Swal.fire({
                 icon: 'warning',
@@ -109,7 +104,6 @@ export default function AddBusStop() {
             return;
         }
 
-        // Jika semua validasi lolos, lanjutkan proses
         setLoading(true);
 
         try {
@@ -121,7 +115,7 @@ export default function AddBusStop() {
                 longitude: parseFloat(formData.longitude),
             };
 
-            console.log("📤 Mengirim Payload:", payload); // Cek console browser
+            console.log("📤 Mengirim Payload:", payload);
 
             const response = await fetch(`${API_URL}/api/halte`, {
                 method: "POST",
@@ -129,11 +123,9 @@ export default function AddBusStop() {
                 body: JSON.stringify(payload),
             });
 
-            // Baca respon error dari backend jika ada
             const result = await response.json().catch(() => ({}));
 
             if (!response.ok) {
-                // Tampilkan pesan spesifik dari backend (misal: "Validation error")
                 throw new Error(result.message || `Gagal menyimpan (${response.status})`);
             }
 
@@ -174,8 +166,7 @@ export default function AddBusStop() {
                 </p>
 
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                    {/* KOLOM KIRI */}
+                    
                     <div className="lg:col-span-1 space-y-4">
                         <div>
                             <label className="block font-medium mb-1">Nama Halte</label>
@@ -225,15 +216,13 @@ export default function AddBusStop() {
                             </button>
                         </div>
                     </div>
-
-                    {/* KOLOM KANAN (MAPS) */}
+                    
                     <div className="lg:col-span-2 h-[500px] border border-gray-300 rounded-xl overflow-hidden relative shadow-inner">
                         <BusStopMap
                             position={formData.latitude ? { lat: parseFloat(formData.latitude), lng: parseFloat(formData.longitude) } : null}
                             setPosition={handleMapSelect}
                         />
-
-                        {/* Overlay Instruksi jika belum pilih lokasi */}
+                        
                         {!formData.latitude && (
                             <div className="absolute inset-0 bg-black/10 flex items-center justify-center z-[1000] pointer-events-none">
                                 <div className="bg-white/90 px-4 py-2 rounded-full shadow-lg text-sm font-bold text-gray-700 animate-bounce">

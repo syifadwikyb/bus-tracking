@@ -12,6 +12,7 @@ import {
     AlertCircle,
     CheckCircle2
 } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 import Header from '@/components/Header';
@@ -21,10 +22,8 @@ export default function ProfilePage() {
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(false);
 
-    // State untuk notifikasi (Sukses/Gagal)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
-    // State form input password
     const [passData, setPassData] = useState({
         oldPassword: '',
         newPassword: '',
@@ -40,37 +39,43 @@ export default function ProfilePage() {
         return "Selamat Malam Admin!";
     };
 
-    // 1. Ambil data user dari LocalStorage saat halaman dimuat
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
             setUser(JSON.parse(storedUser));
         } else {
-            // Jika tidak ada user di storage, lempar ke login
             router.push('/auth/login');
         }
     }, [router]);
 
-    // Handle ketikan di form
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPassData({ ...passData, [e.target.name]: e.target.value });
     };
 
-    // Handle Logout
-    const handleLogout = () => {
-        if (confirm('Yakin ingin keluar dari aplikasi?')) {
+    const handleLogout = async () => {
+        const result = await Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: 'Anda akan keluar dari aplikasi',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3B82F6',
+            confirmButtonText: 'Ya, keluar!',
+            cancelButtonText: 'Batal'
+        });
+
+        if (result.isConfirmed) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
+
             router.push('/auth/login');
         }
     };
 
-    // --- INTEGRASI KE BACKEND (Change Password) ---
     const handleChangePassword = async (e: React.FormEvent) => {
         e.preventDefault();
         setMessage(null);
 
-        // Validasi Frontend: Cek Password Baru vs Konfirmasi
         if (passData.newPassword !== passData.confirmPassword) {
             setMessage({ type: 'error', text: 'Konfirmasi password tidak cocok.' });
             return;
@@ -80,12 +85,11 @@ export default function ProfilePage() {
         try {
             const token = localStorage.getItem('token');
 
-            // Panggil API Backend
             const res = await fetch(`${API_URL}/api/auth/change-password`, {
-                method: 'PUT', // Sesuai route backend Anda
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // Wajib untuk authMiddleware
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     oldPassword: passData.oldPassword,
@@ -96,12 +100,10 @@ export default function ProfilePage() {
             const data = await res.json();
 
             if (!res.ok) {
-                // Tampilkan pesan error dari backend (misal: "Password lama salah")
                 throw new Error(data.message || 'Gagal mengubah password');
             }
 
-            // Jika Berhasil
-            setMessage({ type: 'success', text: data.message }); // "Password berhasil diubah"
+            setMessage({ type: 'success', text: data.message });
             setPassData({ oldPassword: '', newPassword: '', confirmPassword: '' });
 
         } catch (err: any) {
@@ -121,7 +123,6 @@ export default function ProfilePage() {
             />
             <div className="flex flex-col lg:flex-row gap-6">
 
-                {/* --- KARTU PROFIL (KIRI) --- */}
                 <div className="w-full lg:w-1/3">
                     <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                         <div className="p-8 flex flex-col items-center text-center">
@@ -139,7 +140,6 @@ export default function ProfilePage() {
 
                             <div className="mt-6 w-full grid grid-cols-2 gap-4 border-t border-gray-100 pt-6">
                                 <div className="text-center">
-                                    {/* Menampilkan ID Admin sesuai respon Login */}
                                     <span className="block text-xl font-bold text-gray-900">#{user.id_admin}</span>
                                     <span className="text-xs text-gray-500 uppercase tracking-wide">Admin ID</span>
                                 </div>
@@ -160,7 +160,6 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                {/* --- FORM GANTI PASSWORD (KANAN) --- */}
                 <div className="w-full lg:w-2/3">
                     <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
                         <div className="flex items-center space-x-3 mb-6 border-b border-gray-100 pb-4">
@@ -173,7 +172,6 @@ export default function ProfilePage() {
                             </div>
                         </div>
 
-                        {/* Alert Messages */}
                         {message && (
                             <div className={`mb-6 p-4 rounded-xl flex items-start gap-3 animate-fade-in ${message.type === 'success'
                                 ? 'bg-green-50 text-green-700 border border-green-200'

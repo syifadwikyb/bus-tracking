@@ -17,12 +17,10 @@ export default function EditSchedule({ id }: { id: string }) {
     const [loading, setLoading] = useState(false);
     const [loadingData, setLoadingData] = useState(true);
 
-    // Data Master
     const [buses, setBuses] = useState<Bus[]>([]);
     const [drivers, setDrivers] = useState<Driver[]>([]);
     const [jalurs, setJalurs] = useState<Jalur[]>([]);
 
-    // Preview
     const [selectedBus, setSelectedBus] = useState<Bus | null>(null);
     const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
     const [selectedJalur, setSelectedJalur] = useState<Jalur | null>(null);
@@ -37,11 +35,9 @@ export default function EditSchedule({ id }: { id: string }) {
         status: "",
     });
 
-    // Fetch Data
     useEffect(() => {
         async function fetchAllData() {
             try {
-                // A. Fetch Master Data
                 const [busRes, driverRes, jalurRes] = await Promise.all([
                     fetch(`${API_URL}/api/bus`),
                     fetch(`${API_URL}/api/drivers`),
@@ -61,14 +57,12 @@ export default function EditSchedule({ id }: { id: string }) {
                 const jalurList = Array.isArray(jalurData) ? jalurData : (jalurData.data || []);
                 setJalurs(jalurList);
 
-                // B. Fetch Data Jadwal Existing
                 const scheduleRes = await fetch(`${API_URL}/api/schedules/${id}`);
                 if (!scheduleRes.ok) throw new Error("Gagal mengambil data jadwal");
 
                 const scheduleData = await scheduleRes.json();
                 const s = scheduleData.data || scheduleData;
 
-                // C. Isi Form
                 setFormData({
                     busId: s.bus_id?.toString() || "",
                     driverId: s.driver_id?.toString() || "",
@@ -79,7 +73,6 @@ export default function EditSchedule({ id }: { id: string }) {
                     status: s.status || "dijadwalkan",
                 });
 
-                // D. Set Preview Awal
                 if (s.bus_id) setSelectedBus(busList.find((b: Bus) => b.id_bus == s.bus_id) || null);
                 if (s.driver_id) setSelectedDriver(driverList.find((d: Driver) => d.id_driver == s.driver_id) || null);
                 if (s.jalur_id) setSelectedJalur(jalurList.find((j: Jalur) => j.id_jalur == s.jalur_id) || null);
@@ -166,8 +159,7 @@ export default function EditSchedule({ id }: { id: string }) {
         <div className="">
             <Header subtitle="Edit Jadwal" title="Edit Jadwal Perjalanan" />
             <div className="p-6 bg-white rounded-2xl shadow-md">
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* KOLOM KIRI */}
+                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">                    
                     <div className="space-y-4">
                         <div>
                             <label className="block font-medium mb-1">Pilih Bus</label>
@@ -221,8 +213,7 @@ export default function EditSchedule({ id }: { id: string }) {
                             </select>
                         </div>
                     </div>
-
-                    {/* KOLOM KANAN */}
+                    
                     <div className="space-y-4">
                         <div className="flex flex-col items-center border border-blue-300 rounded-xl p-6 h-full bg-gray-50">
                             <h3 className="text-lg font-semibold text-gray-700 mb-4">Preview Edit</h3>

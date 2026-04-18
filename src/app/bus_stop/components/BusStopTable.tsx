@@ -25,7 +25,6 @@ export default function BusStopTable() {
   const [filtered, setFiltered] = useState<BusStop[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // State Filter
   const [search, setSearch] = useState('');
   const [selectedJalur, setSelectedJalur] = useState('');
   const [availableRoutes, setAvailableRoutes] = useState<string[]>([]);
@@ -33,7 +32,6 @@ export default function BusStopTable() {
   const [page, setPage] = useState(1);
   const perPage = 7;
 
-  // Fetch Data
   const fetchBusStops = async () => {
     setLoading(true);
     try {
@@ -44,7 +42,6 @@ export default function BusStopTable() {
 
       setBusStops(list);
 
-      // Ambil daftar jalur unik untuk opsi filter
       const routes = Array.from(new Set(
         list.map((item: BusStop) => item.jalur?.nama_jalur).filter((j: string) => j)
       )) as string[];
@@ -62,7 +59,6 @@ export default function BusStopTable() {
     fetchBusStops();
   }, []);
 
-  // Filter Logic
   useEffect(() => {
     let result = busStops;
 
@@ -93,7 +89,7 @@ export default function BusStopTable() {
     router.push(`/bus_stop/action_bus_stop?mode=edit&id=${halte.id_halte}`);
   };
 
-  const handleDelete = async (halte: BusStop) => {    
+  const handleDelete = async (halte: BusStop) => {
     const result = await Swal.fire({
       title: 'Apakah Anda yakin?',
       text: `Hapus halte ${halte.nama_halte}? Tindakan ini tidak dapat dibatalkan!`,
@@ -105,7 +101,6 @@ export default function BusStopTable() {
       cancelButtonText: 'Batal'
     });
 
-    // 2. Jika user mengonfirmasi penghapusan
     if (result.isConfirmed) {
       try {
         const res = await fetch(`${API_URL}/api/halte/${halte.id_halte}`, {
@@ -114,7 +109,6 @@ export default function BusStopTable() {
 
         if (!res.ok) throw new Error("Gagal menghapus halte");
 
-        // 3. Tampilkan notifikasi sukses
         Swal.fire({
           icon: 'success',
           title: 'Dihapus!',
@@ -123,12 +117,10 @@ export default function BusStopTable() {
           confirmButtonColor: '#3B82F6'
         });
 
-        // Refresh data tabel
         fetchBusStops();
       } catch (error: any) {
         console.error('❌ Gagal menghapus:', error);
 
-        // 4. Tampilkan notifikasi error
         Swal.fire({
           icon: 'error',
           title: 'Gagal!',
@@ -142,7 +134,6 @@ export default function BusStopTable() {
   return (
     <div className="bg-white rounded-lg shadow-lg">
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4">
-        {/* Search Bar di Kiri */}
         <SearchBar
           value={search}
           onChange={setSearch}
@@ -150,7 +141,6 @@ export default function BusStopTable() {
           onSubmit={(e) => e.preventDefault()}
         />
 
-        {/* ✅ 2. Group Button & Filter di Kanan (Sesuai DriverTable) */}
         <div className="flex items-center gap-2 w-full md:w-auto">
           <AddButton route="/bus_stop/action_bus_stop" />
 
@@ -158,7 +148,7 @@ export default function BusStopTable() {
             filters={[
               {
                 label: 'Jalur',
-                options: availableRoutes, // Menggunakan jalur dinamis dari API
+                options: availableRoutes,
                 value: selectedJalur,
                 onChange: setSelectedJalur
               }

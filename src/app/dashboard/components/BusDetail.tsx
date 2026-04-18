@@ -54,7 +54,6 @@ export default function BusDetail({ bus }: BusDetailProps) {
     }
   }, [bus]);
 
-  // Tampilan Placeholder Jika Bus Belum Dipilih
   if (!bus || bus.id_bus === 0) {
     return (
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center items-center text-center min-h-[300px]">
@@ -69,11 +68,10 @@ export default function BusDetail({ bus }: BusDetailProps) {
     );
   }
 
-  // Tampilan Utama Bus Detail
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 overflow-hidden w-full">
       <h3 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Detail Bus</h3>
-      
+
       <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden mb-6 border border-gray-200">
         <img
           src={imgSrc}

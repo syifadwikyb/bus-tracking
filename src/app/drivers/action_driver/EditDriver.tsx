@@ -18,14 +18,13 @@ export default function EditDriver({ id }: { id: string }) {
         nama: "",
         tanggal_lahir: "",
         nomor_telepon: "",
-        status: "", // Hanya untuk display preview
+        status: "",
     });
 
     const [currentFoto, setCurrentFoto] = useState<string | null>(null);
     const [newFotoFile, setNewFotoFile] = useState<File | null>(null);
     const [fotoPreview, setFotoPreview] = useState<string | null>(null);
 
-    // Fetch Data Lama
     useEffect(() => {
         async function fetchDriver() {
             try {
@@ -79,7 +78,6 @@ export default function EditDriver({ id }: { id: string }) {
             payload.append("tanggal_lahir", formData.tanggal_lahir);
             payload.append("nomor_telepon", formData.nomor_telepon);
 
-            // Status TIDAK dikirim agar tidak merusak logika jadwal
 
             if (newFotoFile) {
                 payload.append("driver_foto", newFotoFile);
@@ -129,7 +127,6 @@ export default function EditDriver({ id }: { id: string }) {
                 </p>
 
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* INPUT */}
                     <div className="space-y-4">
                         <div>
                             <label className="block font-medium mb-1">Kode Driver</label>
@@ -153,7 +150,6 @@ export default function EditDriver({ id }: { id: string }) {
                         </div>
                     </div>
 
-                    {/* PREVIEW */}
                     <div className="space-y-4">
                         <div className="flex flex-col items-center border border-blue-300 rounded-xl p-6 h-full bg-gray-50">
                             <h3 className="text-lg font-semibold text-gray-700 mb-4">Preview Edit</h3>
@@ -184,7 +180,6 @@ export default function EditDriver({ id }: { id: string }) {
                         </div>
                     </div>
 
-                    {/* TOMBOL */}
                     <div className="col-span-1 md:col-span-2 flex justify-end space-x-3 mt-4 pt-4 border-t">
                         <Link href="/drivers" className="bg-red-100 text-red-600 px-6 py-2 rounded-xl font-medium hover:bg-red-200">Batal</Link>
                         <button type="submit" disabled={loading} className="bg-teal-100 text-teal-700 px-6 py-2 rounded-xl font-medium hover:bg-teal-200">

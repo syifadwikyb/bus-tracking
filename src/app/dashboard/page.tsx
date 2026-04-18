@@ -1,4 +1,3 @@
-// app/bus_stop/dashboard/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -11,7 +10,6 @@ import Header from '@/components/Header';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// --- TIPE DATA ---
 interface ApiBus {
   id_bus: number;
   kode_bus: string;
@@ -43,7 +41,6 @@ interface ApiStats {
   scheduled: number;
 }
 
-// ✅ UPDATED: Menambahkan passenger_count sebagai optional
 interface SocketLocationData {
   id_bus?: number;
   bus_id?: number;
@@ -55,20 +52,17 @@ interface SocketLocationData {
   daftar_eta?: any[];
 }
 
-// --- FUNGSI KONVERSI ---
 const convertApiBusToBus = (apiBus: ApiBus, routes: any[] = [], drivers: any[] = []): Bus => {
   const jadwalAktif = apiBus.jadwal?.find(
     (j) => j.status?.toLowerCase() === "berjalan"
   ) || apiBus.jadwal?.[0];
 
-  // Cari nama_jalur dari routes berdasarkan jalur_id
   let nama_jalur: string | null = null;
   if (jadwalAktif?.jalur_id) {
     const matchedRoute = routes.find(r => r.id_jalur === jadwalAktif.jalur_id);
     nama_jalur = matchedRoute?.nama_jalur || null;
   }
 
-  // Cari nama driver dari drivers berdasarkan driver_id
   let nama_driver: string | null = null;
   let driver_foto: string | null = null;
   if (jadwalAktif?.driver_id) {
@@ -77,7 +71,6 @@ const convertApiBusToBus = (apiBus: ApiBus, routes: any[] = [], drivers: any[] =
     driver_foto = matchedDriver?.driver_foto || null;
   }
 
-  // Fallback ke API data jika ada
   const finalNama = apiBus.nama || nama_driver || jadwalAktif?.driver?.nama || null;
 
   const convertedBus: Bus = {
@@ -100,7 +93,6 @@ const convertApiBusToBus = (apiBus: ApiBus, routes: any[] = [], drivers: any[] =
   return convertedBus;
 };
 
-// Import Dynamic Dashboard Client
 const DashboardClient = dynamic(() => import('./DashboardClient'), {
   ssr: false,
   loading: () => <div className="p-4 text-center">Memuat komponen dashboard...</div>,
@@ -114,9 +106,7 @@ export default function Page() {
   const [selectedRoute, setSelectedRoute] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // 1. HITUNG STATISTIK DI SINI (LOGIKA FRONTEND)
   useEffect(() => {
-    // Tunggu data terisi
     if (loading && buses.length === 0) return;
 
     const normalize = (s?: string) => s?.toLowerCase().trim() || '';
@@ -125,7 +115,6 @@ export default function Page() {
     const scheduled = buses.filter(b => normalize(b.status) === 'dijadwalkan').length;
     const maintenance = buses.filter(b => normalize(b.status).includes('perbaikan')).length;
 
-    // Hitung stopped berdasarkan sisa agar akurat
     const nonActive = buses.length - (running + scheduled + maintenance);
 
     setStats({
@@ -136,7 +125,6 @@ export default function Page() {
     });
   }, [buses, loading]);
 
-  // 2. FETCH DATA AWAL (HTTP)
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -170,27 +158,20 @@ export default function Page() {
     fetchData();
   }, []);
 
-  // 3. SOCKET LISTENER (REAL-TIME: LOCATION & PASSENGER GABUNGAN)
   useEffect(() => {
     if (!socket.connected) socket.connect();
 
-    // Handler Lokasi & Penumpang
     const handleBusLocation = (data: SocketLocationData) => {
-      // ✅ 1. Pastikan targetId dikonversi menjadi Angka murni
       const targetId = Number(data.id_bus || data.bus_id);
 
       if (!targetId) return;
 
-      // 🔍 CEK CONSOLE: Hapus tanda // di bawah ini jika ingin melihat data masuk
       console.log("📍 Socket Masuk -> ID:", targetId, "Lat:", data.latitude, "Lng:", data.longitude);
 
-      // Update State Daftar Bus
       setBuses((currentBuses) => {
-        // ✅ 2. Samakan tipe datanya menggunakan Number()
         const exists = currentBuses.some(b => Number(b.id_bus) === targetId);
 
         if (!exists) {
-          // Jika log ini muncul, berarti ID dari IoT beda dengan ID di database
           console.warn(`⚠️ Socket ditolak: Bus dengan ID ${targetId} tidak ada di database.`);
           return currentBuses;
         }
@@ -199,7 +180,6 @@ export default function Page() {
           if (Number(bus.id_bus) === targetId) {
             return {
               ...bus,
-              // ✅ 3. Paksa ubah koordinat menjadi Float (Desimal)
               latitude: parseFloat(String(data.latitude)),
               longitude: parseFloat(String(data.longitude)),
               status: 'berjalan',
@@ -214,7 +194,6 @@ export default function Page() {
         });
       });
 
-      // Update Selected Bus (Popup Peta)
       setSelectedBus((prev) => {
         if (prev && Number(prev.id_bus) === targetId) {
           return {
@@ -240,7 +219,6 @@ export default function Page() {
     };
   }, []);
 
-  // Handler Pilih Rute
   const handleRouteSelect = async (routeSummary: any | null) => {
     if (routeSummary) {
       try {
@@ -272,7 +250,6 @@ export default function Page() {
         title="Dasbor"
       />
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
         <StatsCard
           title="Berjalan"

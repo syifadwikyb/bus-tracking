@@ -20,16 +20,15 @@ export default function EditRoute({ id }: { id: string }) {
     const [formData, setFormData] = useState({
         kode_jalur: "",
         nama_jalur: "",
-        status: "aktif", // Default dropdown
+        status: "aktif",
     });
 
     const [points, setPoints] = useState<[number, number][]>([]);
 
-    // --- FETCH DATA ---
     useEffect(() => {
         async function fetchRoute() {
             if (!id) return;
-            console.log(`📡 Fetching Route ID: ${id}`); // Debugging
+            console.log(`📡 Fetching Route ID: ${id}`);
 
             try {
                 const res = await fetch(`${API_URL}/api/jalur/${id}`);
@@ -40,13 +39,10 @@ export default function EditRoute({ id }: { id: string }) {
                 }
 
                 const json = await res.json();
-                const data = json.data || json; // Handle wrapper { data: ... } atau raw object
+                const data = json.data || json;
 
                 console.log("📦 Data Route Diterima:", data);
 
-                // Mapping Status Backend -> Frontend
-                // Backend: 'berjalan'/'berhenti'
-                // Frontend: 'aktif'/'tidak aktif'
                 let statusFrontend = "aktif";
                 if (data.status === 'berhenti') statusFrontend = "tidak aktif";
 
@@ -56,7 +52,6 @@ export default function EditRoute({ id }: { id: string }) {
                     status: statusFrontend,
                 });
 
-                // Parse Polyline String ke Array
                 if (data.rute_polyline && typeof data.rute_polyline === 'string') {
                     try {
                         const parsedPoints = JSON.parse(data.rute_polyline);
@@ -85,7 +80,6 @@ export default function EditRoute({ id }: { id: string }) {
         fetchRoute();
     }, [id]);
 
-    // --- SUBMIT DATA ---
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -97,7 +91,6 @@ export default function EditRoute({ id }: { id: string }) {
         setLoading(true);
 
         try {
-            // Mapping Status Frontend -> Backend
             const statusBackend = formData.status === 'aktif' ? 'berjalan' : 'berhenti';
 
             const payload = {
@@ -145,7 +138,6 @@ export default function EditRoute({ id }: { id: string }) {
 
     if (loadingData) return <div className="p-10 text-center">Memuat data rute...</div>;
 
-    // Tampilan Error jika ID tidak ditemukan / Server Error
     if (error) return (
         <div className="p-10 text-center">
             <div className="text-red-500 mb-4">Error: {error}</div>
@@ -164,8 +156,7 @@ export default function EditRoute({ id }: { id: string }) {
                     <span className="font-medium text-gray-700">Edit Rute</span>
                 </p>
 
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* INPUT FORM */}
+                <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">                    
                     <div className="lg:col-span-1 space-y-4">
                         <div>
                             <label className="block font-medium mb-1">Kode Jalur</label>
@@ -196,8 +187,7 @@ export default function EditRoute({ id }: { id: string }) {
                             </button>
                         </div>
                     </div>
-
-                    {/* MAP */}
+                    
                     <div className="lg:col-span-2 h-[500px] border border-gray-300 rounded-xl overflow-hidden relative">
                         <RouteMap points={points} setPoints={setPoints} />
                         <div className="absolute top-2 right-2 bg-white/90 px-3 py-1 rounded-md shadow z-[1000] text-xs font-bold">

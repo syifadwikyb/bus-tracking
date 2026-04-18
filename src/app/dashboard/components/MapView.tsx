@@ -5,7 +5,6 @@ import dynamic from "next/dynamic";
 import { useMap } from "react-leaflet";
 import type { Bus } from "../DashboardClient";
 
-// ===== Dynamic Import (WAJIB untuk Next.js) =====
 const MapContainer = dynamic(
   () => import("react-leaflet").then((m) => m.MapContainer),
   { ssr: false }
@@ -27,31 +26,25 @@ const Polyline = dynamic(
   { ssr: false }
 );
 
-// ===== Props =====
 interface MapViewProps {
   buses: Bus[];
   selectedRoute: any;
   onBusClick: (bus: Bus) => void;
 }
 
-// ✅ COMPONENT: Hanya Zoom ke Rute saat Rute Berubah
 function FitBoundsToRoute({ polyline, L }: { polyline: [number, number][] | null, L: any }) {
   const map = useMap();
 
   useEffect(() => {
-    // Pastikan L sudah ter-load dan polyline ada
     if (L && polyline && polyline.length > 0) {
-      // Buat bounding box dari koordinat polyline
       const bounds = L.latLngBounds(polyline);
-      // Zoom map pas ke ukuran rute (sekali saja saat polyline berubah)
       map.fitBounds(bounds, { padding: [50, 50] });
     }
-  }, [polyline, map, L]); // Dependency hanya polyline, jadi kalau bus gerak map DIAM.
+  }, [polyline, map, L]);
 
   return null;
 }
 
-// ===== Bearing / Rotasi =====
 const calculateBearing = (
   lat1: number,
   lon1: number,
@@ -93,7 +86,6 @@ export default function MapView({
   );
   const rotations = useRef<Map<number, number>>(new Map());
 
-  // ===== Init Leaflet =====
   useEffect(() => {
     import("leaflet").then((leaflet) => {
       setL(leaflet);
@@ -109,7 +101,6 @@ export default function MapView({
     });
   }, []);
 
-  // ===== PARSE RUTE DARI BACKEND =====
   useEffect(() => {
     if (selectedRoute?.rute_polyline) {
       try {
@@ -127,7 +118,6 @@ export default function MapView({
     }
   }, [selectedRoute]);
 
-  // ===== Hitung Rotasi Bus =====
   useEffect(() => {
     buses.forEach((bus) => {
       const lat = Number(bus.latitude);
@@ -161,7 +151,6 @@ export default function MapView({
     );
   }
 
-  // ===== Bus Valid =====
   const activeBuses = buses.filter(
     (b) =>
       b.status === "berjalan" &&
@@ -194,8 +183,7 @@ export default function MapView({
             opacity={0.8}
           />
         )}
-
-        {/* ===== HALTE ===== */}
+        
         {selectedRoute?.halte?.map((h: any) => (
           <Marker
             key={h.id_halte}
@@ -210,8 +198,7 @@ export default function MapView({
             </Popup>
           </Marker>
         ))}
-
-        {/* ===== BUS ===== */}
+        
         {activeBuses.map((bus) => {
           const rotation = rotations.current.get(bus.id_bus) || 0;
 

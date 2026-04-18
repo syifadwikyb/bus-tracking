@@ -7,18 +7,16 @@ import Header from "@/components/Header";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Fungsi format tanggal (sama seperti Edit)
 const formatDateForInput = (dateString: string | null | undefined) => {
     if (!dateString) return "";
     try {
         const date = new Date(dateString);
-        return date.toISOString().split('T')[0]; // "YYYY-MM-DD"
+        return date.toISOString().split('T')[0];
     } catch {
         return "";
     }
 };
 
-// Asumsi Tipe (sama seperti Edit)
 interface Maintenance {
     id_maintenance: number;
     bus_id: number;
@@ -48,7 +46,6 @@ const ShowMaintenance: React.FC<{ id: string }> = ({ id }) => {
         status: "dijadwalkan",
     });
 
-    // 🔹 Ambil data maintenance dan bus terkait
     useEffect(() => {
         if (!id) return;
         const fetchMaintenanceData = async () => {
@@ -57,7 +54,6 @@ const ShowMaintenance: React.FC<{ id: string }> = ({ id }) => {
                 const res = await fetch(`${API_URL}/api/maintenance/${id}`);
                 if (!res.ok) throw new Error('Gagal mengambil data maintenance');
 
-                // Ambil data maintenance (termasuk bus)
                 const data: Maintenance & { bus?: Bus } = await res.json();
 
                 setFormData({
@@ -90,7 +86,6 @@ const ShowMaintenance: React.FC<{ id: string }> = ({ id }) => {
         return <div className="p-6 text-center">Memuat data...</div>;
     }
 
-    // Set properti disabled untuk semua field
     const isDisabled = true;
 
     const getGreeting = () => {
@@ -120,8 +115,7 @@ const ShowMaintenance: React.FC<{ id: string }> = ({ id }) => {
                     </span>
                 </p>
 
-                <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Kolom kiri (Form) */}
+                <form className="grid grid-cols-1 md:grid-cols-2 gap-6">                    
                     <div className="space-y-4">
                         <div>
                             <label className="block font-medium mb-1">Nomor Polisi</label>
@@ -166,8 +160,7 @@ const ShowMaintenance: React.FC<{ id: string }> = ({ id }) => {
                             />
                         </div>
                     </div>
-
-                    {/* Kolom kanan (Preview & Biaya) */}
+                    
                     <div className="space-y-4">
                         <div className="flex flex-col items-center border border-blue-300 rounded-xl p-3">
                             {selectedBus?.foto ? (
@@ -211,8 +204,7 @@ const ShowMaintenance: React.FC<{ id: string }> = ({ id }) => {
                             />
                         </div>
                     </div>
-
-                    {/* Tombol Aksi */}
+                    
                     <div className="col-span-2 flex justify-end space-x-3 mt-4">
                         <Link
                             href="/maintenance"

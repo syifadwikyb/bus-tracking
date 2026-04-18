@@ -13,8 +13,8 @@ const quicksand = Quicksand({
 });
 
 export const metadata: Metadata = {
-  title: "BusTrack - Management System",
-  description: "Bus Management System Application",
+  title: "DipTrack",
+  description: "Sistem Pemantauan Bus Universitas Diponegoro",
 };
 
 export default function RootLayout({

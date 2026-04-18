@@ -58,7 +58,7 @@ export default function BusTable({ buses, onRowClick }: BusTableProps) {
             runningBuses.map((bus) => (
               <tr
                 key={bus.id_bus}
-                onClick={() => onRowClick(bus)} // ✅ KIRIM BUS
+                onClick={() => onRowClick(bus)}
                 className="hover:bg-gray-50 cursor-pointer"
               >
                 <td className="px-6 py-4 font-medium">{bus.plat_nomor}</td>

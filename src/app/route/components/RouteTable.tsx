@@ -1,8 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; // Import Router
-import RouteRow, { Route } from './RouteRow'; // Import Interface Route dari RouteRow agar sinkron
+import { useEffect, useState } from 'react'; import { useRouter } from 'next/navigation'; import RouteRow, { Route } from './RouteRow';
 
 import SearchBar from '@/components/SearchBar';
 import AddButton from '@/components/AddButton';
@@ -15,20 +13,16 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export default function RouteTable() {
     const router = useRouter();
 
-    // State Data
     const [allRoutes, setAllRoutes] = useState<Route[]>([]);
     const [filteredRoutes, setFilteredRoutes] = useState<Route[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // State Filter
     const [search, setSearch] = useState('');
     const [filterStatus, setFilterStatus] = useState('');
 
-    // State Paginasi
     const [currentPage, setCurrentPage] = useState(1);
     const perPage = 7;
 
-    // --- 1. Fetch Data ---
     async function fetchRoutes() {
         setLoading(true);
         try {
@@ -36,7 +30,6 @@ export default function RouteTable() {
             if (!res.ok) throw new Error('Gagal fetch data rute');
 
             const data = await res.json();
-            // Handle format { data: [...] } atau [...]
             const routeData = Array.isArray(data) ? data : (data.data || []);
 
             setAllRoutes(routeData);
@@ -54,7 +47,6 @@ export default function RouteTable() {
         fetchRoutes();
     }, []);
 
-    // --- 2. Filter Logic ---
     useEffect(() => {
         let data = allRoutes;
 
@@ -66,8 +58,6 @@ export default function RouteTable() {
         }
 
         if (filterStatus) {
-            // Pastikan status di database match dengan filter (aktif/tidak aktif)
-            // Jika di DB statusnya 'berjalan'/'berhenti', sesuaikan string di sini
             data = data.filter((r) => r.status.toLowerCase() === filterStatus.toLowerCase());
         }
 
@@ -75,33 +65,27 @@ export default function RouteTable() {
         setCurrentPage(1);
     }, [search, filterStatus, allRoutes]);
 
-    // --- 3. Action Handlers ---
 
-    // Navigasi ke Halaman Detail
     const handleShow = (route: Route) => {
         router.push(`/route/action_route?mode=show&id=${route.id_jalur}`);
     };
 
-    // Navigasi ke Halaman Edit
     const handleEdit = (route: Route) => {
         router.push(`/route/action_route?mode=edit&id=${route.id_jalur}`);
     };
 
-    // Fungsi Delete (API Call)
     const handleDelete = async (route: Route) => {
-        // 1. Tampilkan SweetAlert untuk Konfirmasi
         const result = await Swal.fire({
             title: 'Apakah Anda yakin?',
             text: `Hapus rute ${route.nama_jalur}? Tindakan ini tidak dapat dibatalkan!`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33', // Merah untuk aksi hapus
-            cancelButtonColor: '#3B82F6', // Biru untuk batal
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3B82F6',
             confirmButtonText: 'Ya, hapus!',
             cancelButtonText: 'Batal'
         });
 
-        // 2. Jika user menekan tombol "Ya, hapus!"
         if (result.isConfirmed) {
             try {
                 const res = await fetch(`${API_URL}/api/jalur/${route.id_jalur}`, {
@@ -110,7 +94,6 @@ export default function RouteTable() {
 
                 if (!res.ok) throw new Error("Gagal menghapus rute");
 
-                // 3. Tampilkan notifikasi sukses
                 Swal.fire({
                     icon: 'success',
                     title: 'Dihapus!',
@@ -119,11 +102,10 @@ export default function RouteTable() {
                     confirmButtonColor: '#3B82F6'
                 });
 
-                fetchRoutes(); // Refresh data tabel
+                fetchRoutes();
             } catch (error: any) {
                 console.error('❌ Gagal menghapus:', error);
 
-                // 4. Tampilkan notifikasi error
                 Swal.fire({
                     icon: 'error',
                     title: 'Gagal!',
@@ -134,7 +116,6 @@ export default function RouteTable() {
         }
     };
 
-    // --- 4. Pagination Logic ---
     const totalPages = Math.ceil(filteredRoutes.length / perPage);
     const currentData = filteredRoutes.slice(
         (currentPage - 1) * perPage,
@@ -142,8 +123,7 @@ export default function RouteTable() {
     );
 
     return (
-        <div className="bg-white rounded-lg shadow-lg">
-            {/* Header Controls */}
+        <div className="bg-white rounded-lg shadow-lg">            
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4">
                 <SearchBar
                     value={search}
@@ -151,14 +131,13 @@ export default function RouteTable() {
                     onClear={() => setSearch('')}
                     onSubmit={(e) => e.preventDefault()}
                 />
-                <div className="flex items-center gap-2">
-                    {/* Pastikan route sesuai folder: action_route */}
+                <div className="flex items-center gap-2">                    
                     <AddButton route="/route/action_route" />
                     <FilterDropdown
                         filters={[
                             {
                                 label: 'Status',
-                                options: ['aktif', 'tidak aktif'], // Sesuaikan dengan nilai di DB
+                                options: ['aktif', 'tidak aktif'],
                                 value: filterStatus,
                                 onChange: setFilterStatus,
                             },
@@ -166,8 +145,7 @@ export default function RouteTable() {
                     />
                 </div>
             </div>
-
-            {/* Table */}
+            
             <div className="overflow-x-auto">
                 <table className="text-center min-w-full divide-y divide-blue-200">
                     <thead className="bg-blue-50">
@@ -202,8 +180,7 @@ export default function RouteTable() {
                     </tbody>
                 </table>
             </div>
-
-            {/* Pagination */}
+            
             {totalPages > 1 && (
                 <div className="px-6 py-3">
                     <Pagination

@@ -34,7 +34,6 @@ export default function BusTable() {
     const [currentPage, setCurrentPage] = useState(1);
     const perPage = 7;
 
-    // Fetch Data
     async function fetchBuses() {
         setLoading(true);
         try {
@@ -55,7 +54,6 @@ export default function BusTable() {
         fetchBuses();
     }, []);
 
-    // Filter Logic
     useEffect(() => {
         let data = allBuses;
         if (search) {
@@ -72,7 +70,6 @@ export default function BusTable() {
         setCurrentPage(1);
     }, [search, filterStatus, filterJenis, filterKapasitas, allBuses]);
 
-    // --- NAVIGASI KE HALAMAN ACTION ---
     function handleShow(bus: Bus) {
         router.push(`/bus/action_bus?mode=show&id=${bus.id_bus}`);
     }
@@ -81,7 +78,6 @@ export default function BusTable() {
         router.push(`/bus/action_bus?mode=edit&id=${bus.id_bus}`);
     }
 
-    // --- FUNGSI DELETE BUS ---
     async function handleDelete(bus: Bus) {
         const result = await Swal.fire({
             title: 'Apakah Anda yakin?',
@@ -105,7 +101,6 @@ export default function BusTable() {
                     throw new Error(errorData.message || "Gagal menghapus data");
                 }
 
-                // ✅ KONSISTENSI: Update state lokal tanpa fetch ulang
                 setAllBuses(allBuses.filter(b => b.id_bus !== bus.id_bus));
                 setFilteredBuses(filteredBuses.filter(b => b.id_bus !== bus.id_bus));
 
@@ -129,7 +124,6 @@ export default function BusTable() {
         }
     }
 
-    // ✅ KONSISTENSI: Rumus Pagination disamakan agar mudah dibaca
     const totalPages = Math.ceil(filteredBuses.length / perPage);
     const indexOfLast = currentPage * perPage;
     const indexOfFirst = indexOfLast - perPage;

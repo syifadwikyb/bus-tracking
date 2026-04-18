@@ -31,13 +31,13 @@ function ClickHandler({ onMapClick, readOnly }: { onMapClick: (latlng: L.LatLng)
 }
 
 interface RouteMapProps {
-    points: [number, number][]; 
-    setPoints?: (points: [number, number][]) => void; 
+    points: [number, number][];
+    setPoints?: (points: [number, number][]) => void;
     readOnly?: boolean;
 }
 
 const RouteMap = ({ points, setPoints, readOnly = false }: RouteMapProps) => {
-    
+
     const defaultCenter: [number, number] = [-6.966667, 110.416664];
 
     const handleMapClick = (latlng: L.LatLng) => {
@@ -58,15 +58,12 @@ const RouteMap = ({ points, setPoints, readOnly = false }: RouteMapProps) => {
                 attribution='&copy; OpenStreetMap contributors'
             />
 
-            {/* Logic Klik */}
             <ClickHandler onMapClick={handleMapClick} readOnly={readOnly} />
 
-            {/* Gambar Garis Rute */}
             {points.length > 1 && (
                 <Polyline positions={points} color="blue" weight={5} opacity={0.7} />
             )}
 
-            {/* Gambar Marker (Titik) */}
             {points.map((pos, idx) => (
                 <Marker key={idx} position={pos} icon={customIcon} />
             ))}

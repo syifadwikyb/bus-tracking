@@ -11,11 +11,9 @@ export default function ClientLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  
-  // 1. State untuk Loading Auth
+    
   const [isLoading, setIsLoading] = useState(true);
-  
-  // 2. State untuk Buka/Tutup Sidebar di Mobile
+    
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -30,8 +28,7 @@ export default function ClientLayout({
       setIsLoading(false);
     }
   }, [pathname, router]);
-
-  // Tutup sidebar otomatis saat pindah halaman (UX Mobile)
+  
   useEffect(() => {
     setIsSidebarOpen(false);
   }, [pathname]);

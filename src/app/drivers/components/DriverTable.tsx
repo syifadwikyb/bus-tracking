@@ -21,18 +21,16 @@ interface Driver {
 }
 
 export default function DriverTable() {
-  const router = useRouter(); // ➕ Init Router
+  const router = useRouter();
   const [allDrivers, setAllDrivers] = useState<Driver[]>([]);
   const [filteredDrivers, setFilteredDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ... state lain tetap sama ...
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const perPage = 7;
 
-  // Fetch Data
   async function fetchDrivers() {
     setLoading(true);
     try {
@@ -53,7 +51,6 @@ export default function DriverTable() {
     fetchDrivers();
   }, []);
 
-  // Filter Logic (Tetap sama)
   useEffect(() => {
     let data = allDrivers;
     if (search) {
@@ -69,7 +66,6 @@ export default function DriverTable() {
     setCurrentPage(1);
   }, [search, filterStatus, allDrivers]);
 
-  // --- NAVIGASI ACTION ---
   const handleShow = (driver: Driver) => {
     router.push(`/drivers/action_driver?mode=show&id=${driver.id_driver}`);
   };
@@ -78,7 +74,6 @@ export default function DriverTable() {
     router.push(`/drivers/action_driver?mode=edit&id=${driver.id_driver}`);
   };
 
-  // --- DELETE FUNCTION ---
   const handleDelete = async (driver: Driver) => {
     const result = await Swal.fire({
       title: 'Apakah Anda yakin?',
@@ -99,7 +94,6 @@ export default function DriverTable() {
 
         if (!res.ok) throw new Error("Gagal menghapus driver");
 
-        // Tampilkan notifikasi sukses
         Swal.fire({
           icon: 'success',
           title: 'Dihapus!',
@@ -108,12 +102,10 @@ export default function DriverTable() {
           confirmButtonColor: '#3B82F6'
         });
 
-        // Refresh data setelah berhasil dihapus
         fetchDrivers();
       } catch (error: any) {
         console.error('❌ Gagal menghapus:', error);
 
-        // Tampilkan notifikasi error
         Swal.fire({
           icon: 'error',
           title: 'Gagal!',

@@ -43,8 +43,7 @@ export default function BusETA({ bus }: BusETAProps) {
               const etaMinutes = eta.eta_seconds ? Math.round(eta.eta_seconds / 60) : 0;
 
               return (
-                <div key={eta.halte_id || index} className="mb-6 ml-6 relative">
-                  {/* Lingkaran Titik Timeline */}
+                <div key={eta.halte_id || index} className="mb-6 ml-6 relative">                  
                   <span className={`absolute flex items-center justify-center w-4 h-4 rounded-full -left-[1.95rem] ring-4 ring-white transition-colors duration-300
                     ${isTarget ? 'bg-blue-600 shadow-sm' : 'bg-gray-300'}`}>
                   </span>
@@ -59,8 +58,7 @@ export default function BusETA({ bus }: BusETAProps) {
                         Berjarak {formatDistance(eta.distance_meters)}
                       </p>
                     </div>
-
-                    {/* Kotak Waktu */}
+                    
                     <div className={`text-right shrink-0 transition-all duration-300 ${isTarget ? 'bg-blue-50 px-3 py-1.5 rounded-md border border-blue-100' : 'py-1.5'}`}>
                       <span className={`text-sm font-bold ${isTarget ? 'text-blue-700' : 'text-gray-600'}`}>
                         {eta.eta_seconds === null ? '...' : (etaMinutes < 1 ? '< 1 Menit' : `${etaMinutes} Menit`)}

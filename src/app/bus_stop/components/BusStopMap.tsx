@@ -5,7 +5,6 @@ import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-lea
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Fix icon marker leaflet
 const iconUrl = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png';
 const iconRetinaUrl = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png';
 const shadowUrl = 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png';
@@ -18,7 +17,6 @@ const customIcon = L.icon({
     iconAnchor: [12, 41],
 });
 
-// Fitur: Klik peta untuk set lokasi
 function LocationMarker({ position, setPosition, readOnly }: any) {
     useMapEvents({
         click(e) {
@@ -31,7 +29,6 @@ function LocationMarker({ position, setPosition, readOnly }: any) {
     return position ? <Marker position={position} icon={customIcon} /> : null;
 }
 
-// Fitur: Pindah kamera peta saat koordinat berubah (misal dari input manual)
 function MapUpdater({ center }: { center: [number, number] }) {
     const map = useMap();
     useEffect(() => {
@@ -47,7 +44,6 @@ interface BusStopProps {
 }
 
 const BusStop = ({ position, setPosition, readOnly = false }: BusStopProps) => {
-    // Default center: Semarang (sesuaikan kebutuhan)
     const defaultCenter: [number, number] = [-6.966667, 110.416664];
     const mapCenter = position ? [position.lat, position.lng] : defaultCenter;
 

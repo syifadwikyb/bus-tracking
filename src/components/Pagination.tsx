@@ -10,7 +10,6 @@ interface PaginationProps {
   onNext: () => void;
 }
 
-// Komponen paginasi
 export default function Pagination({
   currentPage,
   totalPages,
@@ -18,13 +17,11 @@ export default function Pagination({
   onPrev,
   onNext,
 }: PaginationProps) {
-  
-  // Membuat array nomor halaman, misal: [1, 2, 3]
+
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
     <nav className="flex items-center justify-end gap-2">
-      {/* Tombol Previous */}
       <button
         onClick={onPrev}
         disabled={currentPage === 1}
@@ -34,24 +31,21 @@ export default function Pagination({
         <ChevronLeft size={18} />
       </button>
 
-      {/* Nomor Halaman */}
       <div className="flex items-center gap-1">
         {pages.map((page) => (
           <button
             key={page}
             onClick={() => onPageSelect(page)}
-            className={`px-3 py-1 rounded-lg text-sm font-medium ${
-              currentPage === page
+            className={`px-3 py-1 rounded-lg text-sm font-medium ${currentPage === page
                 ? 'bg-blue-600 text-white'
                 : 'bg-white text-gray-700 hover:bg-gray-100'
-            }`}
+              }`}
           >
             {page}
           </button>
         ))}
       </div>
 
-      {/* Tombol Next */}
       <button
         onClick={onNext}
         disabled={currentPage === totalPages}

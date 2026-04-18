@@ -28,10 +28,9 @@ const AddMaintenance: React.FC = () => {
         tanggalSelesai: "",
         deskripsi: "",
         biaya: "",
-        status: "", // 🔹 Awalnya kosong agar wajib dipilih
+        status: "",
     });
 
-    // 🔹 Ambil data bus
     useEffect(() => {
         const fetchBuses = async () => {
             try {
@@ -64,7 +63,6 @@ const AddMaintenance: React.FC = () => {
         fetchBuses();
     }, []);
 
-    // 🔹 Handle input
     const handleChange = (
         e: React.ChangeEvent<
             HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -79,11 +77,9 @@ const AddMaintenance: React.FC = () => {
         }
     };
 
-    // 🔹 Submit form
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // 🔒 Validasi sebelum submit
         if (!formData.busId) {
             alert("⚠️ Silakan pilih bus terlebih dahulu!");
             return;
@@ -144,7 +140,6 @@ const AddMaintenance: React.FC = () => {
         }
     };
 
-    // 🔹 Reset form
     const handleReset = () => {
         setFormData({
             busId: "",
@@ -188,8 +183,7 @@ const AddMaintenance: React.FC = () => {
                 <form
                     onSubmit={handleSubmit}
                     className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                >
-                    {/* Kolom kiri */}
+                >                    
                     <div className="space-y-4">
                         <div>
                             <label className="block font-medium mb-1">Nomor Polisi</label>
@@ -252,8 +246,7 @@ const AddMaintenance: React.FC = () => {
                             />
                         </div>
                     </div>
-
-                    {/* Kolom kanan */}
+                    
                     <div className="space-y-4">
                         <div className="flex flex-col items-center border border-blue-300 rounded-xl p-3">
                             {selectedBus?.foto ? (

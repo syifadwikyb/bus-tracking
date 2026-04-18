@@ -117,13 +117,11 @@ export default function BusChart() {
 
   return (
     <div className="bg-white p-4 md:p-6 rounded-xl shadow-md w-full">
-      {/* Header & Filter Section */}
       <div className="md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
           <h3 className="text-lg font-bold text-gray-800">Utilisasi Armada</h3>
         </div>
 
-        {/* Filter Tanggal Responsive */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full md:w-auto bg-gray-50 p-2 rounded-lg border border-gray-100">
           <div className="w-full sm:w-auto">
             <span className="text-xs text-gray-400 block sm:hidden mb-1">Dari:</span>
@@ -149,8 +147,6 @@ export default function BusChart() {
         </div>
       </div>
 
-      {/* Chart Container Responsive */}
-      {/* Tinggi 300px di HP, 400px di Tablet/Desktop */}
       <div className="relative w-full h-[300px] md:h-[400px]">
         {chartData.length > 0 ? (
           <Bar options={options} data={data} />
