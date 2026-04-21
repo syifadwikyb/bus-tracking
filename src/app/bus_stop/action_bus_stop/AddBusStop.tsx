@@ -166,7 +166,7 @@ export default function AddBusStop() {
                 </p>
 
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
+
                     <div className="lg:col-span-1 space-y-4">
                         <div>
                             <label className="block font-medium mb-1">Nama Halte</label>
@@ -216,13 +216,13 @@ export default function AddBusStop() {
                             </button>
                         </div>
                     </div>
-                    
+
                     <div className="lg:col-span-2 h-[500px] border border-gray-300 rounded-xl overflow-hidden relative shadow-inner">
                         <BusStopMap
                             position={formData.latitude ? { lat: parseFloat(formData.latitude), lng: parseFloat(formData.longitude) } : null}
                             setPosition={handleMapSelect}
                         />
-                        
+
                         {!formData.latitude && (
                             <div className="absolute inset-0 bg-black/10 flex items-center justify-center z-[1000] pointer-events-none">
                                 <div className="bg-white/90 px-4 py-2 rounded-full shadow-lg text-sm font-bold text-gray-700 animate-bounce">
