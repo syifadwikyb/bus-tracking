@@ -55,7 +55,7 @@ export default function ShowSchedule({ id }: { id: string }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                     <div className="space-y-4">
                         <div>
-                            <p className="text-sm text-gray-500">Driver</p>
+                            <p className="text-sm text-gray-500">Sopir</p>
                             <p className="font-medium text-lg">{data.driver?.nama || '-'}</p>
                         </div>
                         <div>

@@ -93,7 +93,7 @@ export default function EditDriver({ id }: { id: string }) {
             Swal.fire({
                 icon: 'success',
                 title: 'Berhasil!',
-                text: 'Driver berhasil diperbarui!',
+                text: 'Sopir berhasil diperbarui!',
                 confirmButtonText: 'OK',
                 confirmButtonColor: '#3B82F6'
             }).then((result) => {
@@ -119,17 +119,17 @@ export default function EditDriver({ id }: { id: string }) {
 
     return (
         <div className="p-8">
-            <Header subtitle="Edit Data" title="Edit Data Driver" />
+            <Header subtitle="Edit Data" title="Edit Data Sopir" />
 
             <div className="p-6 bg-white rounded-2xl shadow-md">
                 <p className="text-sm text-gray-500 mb-6">
-                    <Link href="/drivers" className="hover:text-blue-600 hover:underline">Manajemen Driver</Link> / <span className="font-medium text-gray-700">Edit Driver</span>
+                    <Link href="/drivers" className="hover:text-blue-600 hover:underline">Manajemen Sopir</Link> / <span className="font-medium text-gray-700">Edit Sopir</span>
                 </p>
 
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                         <div>
-                            <label className="block font-medium mb-1">Kode Driver</label>
+                            <label className="block font-medium mb-1">Kode Sopir</label>
                             <input type="text" name="kode_driver" value={formData.kode_driver} onChange={handleChange} className="w-full border border-blue-400 rounded-xl p-2" required />
                         </div>
                         <div>

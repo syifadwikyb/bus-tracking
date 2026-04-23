@@ -171,7 +171,7 @@ export default function EditSchedule({ id }: { id: string }) {
                             </select>
                         </div>
                         <div>
-                            <label className="block font-medium mb-1">Pilih Driver</label>
+                            <label className="block font-medium mb-1">Pilih Sopir</label>
                             <select name="driverId" value={formData.driverId} onChange={handleChange} className="w-full border border-blue-400 rounded-xl p-2" required>
                                 <option value="">-- Pilih Driver --</option>
                                 {drivers.map((driver) => (
@@ -223,7 +223,7 @@ export default function EditSchedule({ id }: { id: string }) {
 
                             <div className="w-full space-y-3 px-4">
                                 <p className="flex justify-between border-b pb-2"><span className="text-gray-500">Bus:</span> <span className="font-medium">{selectedBus?.plat_nomor}</span></p>
-                                <p className="flex justify-between border-b pb-2"><span className="text-gray-500">Driver:</span> <span className="font-medium">{selectedDriver?.nama}</span></p>
+                                <p className="flex justify-between border-b pb-2"><span className="text-gray-500">Sopir:</span> <span className="font-medium">{selectedDriver?.nama}</span></p>
                                 <p className="flex justify-between border-b pb-2"><span className="text-gray-500">Jalur:</span> <span className="font-medium text-sm">{selectedJalur?.nama_jalur}</span></p>
                                 <p className="flex justify-between border-b pb-2"><span className="text-gray-500">Status:</span> <span className="font-bold uppercase text-blue-600">{formData.status}</span></p>
                             </div>

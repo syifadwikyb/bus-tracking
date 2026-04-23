@@ -186,7 +186,7 @@ const AddMaintenance: React.FC = () => {
                 >                    
                     <div className="space-y-4">
                         <div>
-                            <label className="block font-medium mb-1">Nomor Polisi</label>
+                            <label className="block font-medium mb-1">Plat Nomor</label>
                             {loadingBus ? (
                                 <p className="text-sm text-gray-500">Memuat daftar bus...</p>
                             ) : (
@@ -241,7 +241,7 @@ const AddMaintenance: React.FC = () => {
                                 rows={4}
                                 value={formData.deskripsi}
                                 onChange={handleChange}
-                                placeholder="Tuliskan deskripsi maintenance..."
+                                placeholder="Tuliskan deskripsi perawatan..."
                                 className="w-full border border-blue-400 rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                             />
                         </div>

@@ -118,7 +118,7 @@ const ShowMaintenance: React.FC<{ id: string }> = ({ id }) => {
                 <form className="grid grid-cols-1 md:grid-cols-2 gap-6">                    
                     <div className="space-y-4">
                         <div>
-                            <label className="block font-medium mb-1">Nomor Polisi</label>
+                            <label className="block font-medium mb-1">Plat Nomor</label>
                             <input
                                 type="text"
                                 value={selectedBus?.plat_nomor || 'Memuat...'}

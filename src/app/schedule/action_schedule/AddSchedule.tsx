@@ -108,7 +108,7 @@ export default function AddSchedule() {
         e.preventDefault();
 
         if (!formData.busId || !formData.driverId || !formData.jalurId) {
-            alert("⚠️ Harap pilih Bus, Driver, dan Jalur!");
+            alert("⚠️ Harap pilih Bus, Sopir, dan Jalur!");
             return;
         }
 
@@ -225,7 +225,7 @@ export default function AddSchedule() {
                         </div>
 
                         <div>
-                            <label className="block font-medium mb-1">Pilih Driver</label>
+                            <label className="block font-medium mb-1">Pilih Sopir</label>
                             {loadingData ? (
                                 <p className="text-sm text-gray-400">Memuat data...</p>
                             ) : (
@@ -236,7 +236,7 @@ export default function AddSchedule() {
                                     className="w-full border border-blue-400 rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                                     required
                                 >
-                                    <option value="">-- Pilih Driver --</option>
+                                    <option value="">-- Pilih Sopir --</option>
                                     {drivers.map((driver) => (
                                         <option key={driver.id_driver} value={driver.id_driver}>
                                             {driver.nama}
@@ -334,7 +334,7 @@ export default function AddSchedule() {
                                     </span>
                                 </div>
                                 <div className="flex justify-between border-b pb-2">
-                                    <span className="text-gray-500">Driver:</span>
+                                    <span className="text-gray-500">Sopir:</span>
                                     <span className="font-medium text-gray-800">
                                         {selectedDriver ? selectedDriver.nama : "-"}
                                     </span>

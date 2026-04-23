@@ -153,7 +153,7 @@ export default function ScheduleTable() {
                     <thead className="bg-blue-50">
                         <tr>
                             <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Plat Nomor</th>
-                            <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Driver</th>
+                            <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Sopir</th>
                             <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Tanggal</th>
                             <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Jam Mulai</th>
                             <th className="px-6 py-3 text-center text-xs font-semibold text-blue-500 uppercase">Jam Selesai</th>

@@ -64,7 +64,7 @@ export default function AddDriver() {
 
             if (!response.ok) {
                 const result = await response.json();
-                throw new Error(result.message || "Gagal menyimpan data driver");
+                throw new Error(result.message || "Gagal menyimpan data sopir");
             }
 
             Swal.fire({
@@ -102,7 +102,7 @@ export default function AddDriver() {
 
     return (
         <div className="p-8">
-            <Header subtitle={getGreeting()} title="Tambah Driver Baru" />
+            <Header subtitle={getGreeting()} title="Tambah Sopir Baru" />
 
             <div className="p-6 bg-white rounded-2xl shadow-md">
                 <p className="text-sm text-gray-500 mb-6" aria-label="breadcrumb">
@@ -110,19 +110,19 @@ export default function AddDriver() {
                         Manajemen Driver
                     </Link>
                     <span className="mx-2">/</span>
-                    <span className="font-medium text-gray-700">Tambah Driver</span>
+                    <span className="font-medium text-gray-700">Tambah Sopir</span>
                 </p>
 
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
                     <div className="space-y-4">
                         <div>
-                            <label className="block font-medium mb-1">Kode Driver</label>
+                            <label className="block font-medium mb-1">Kode Sopir</label>
                             <input type="text" name="kode_driver" value={formData.kode_driver} onChange={handleChange} placeholder="Contoh: DRV-001" className="w-full border border-blue-400 rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
                         </div>
                         <div>
                             <label className="block font-medium mb-1">Nama Lengkap</label>
-                            <input type="text" name="nama" value={formData.nama} onChange={handleChange} placeholder="Nama Driver" className="w-full border border-blue-400 rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+                            <input type="text" name="nama" value={formData.nama} onChange={handleChange} placeholder="Nama Sopir" className="w-full border border-blue-400 rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
                         </div>
                         <div>
                             <label className="block font-medium mb-1">Tanggal Lahir</label>
@@ -133,7 +133,7 @@ export default function AddDriver() {
                             <input type="tel" name="nomor_telepon" value={formData.nomor_telepon} onChange={handleChange} placeholder="08xxxxxxxxxx" className="w-full border border-blue-400 rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
                         </div>
                         <div>
-                            <label className="block font-medium mb-1">Foto Driver</label>
+                            <label className="block font-medium mb-1">Foto Sopir</label>
                             <input type="file" accept="image/*" onChange={handleFileChange} className="w-full border border-blue-400 rounded-xl p-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400" />
                             <p className="text-xs text-gray-400 mt-1">*Format: JPG, PNG. Maks 2MB.</p>
                         </div>
@@ -141,7 +141,7 @@ export default function AddDriver() {
                     
                     <div className="space-y-4">
                         <div className="flex flex-col items-center border border-blue-300 rounded-xl p-6 h-full bg-gray-50">
-                            <h3 className="text-lg font-semibold text-gray-700 mb-4">Preview Driver</h3>
+                            <h3 className="text-lg font-semibold text-gray-700 mb-4">Preview Sopir</h3>
                             
                             <div className="mb-4">
                                 {fotoPreview ? (
@@ -154,8 +154,8 @@ export default function AddDriver() {
                             </div>
 
                             <div className="w-full space-y-3 px-4 text-center">
-                                <h4 className="text-xl font-bold text-gray-800">{formData.nama || "Nama Driver"}</h4>
-                                <p className="text-sm text-gray-500">{formData.kode_driver || "Kode Driver"}</p>
+                                <h4 className="text-xl font-bold text-gray-800">{formData.nama || "Nama Sopir"}</h4>
+                                <p className="text-sm text-gray-500">{formData.kode_driver || "Kode Sopir"}</p>
 
                                 <div className="mt-4 pt-4 border-t w-full text-left space-y-2">
                                     <div className="flex justify-between">
