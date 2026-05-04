@@ -202,7 +202,7 @@ const EditMaintenance: React.FC<{ id: string }> = ({ id }) => {
                 >
                     <div className="space-y-4">
                         <div>
-                            <label className="block font-medium mb-1">Nomor Polisi</label>
+                            <label className="block font-medium mb-1">Plat Nomor</label>
                             <select
                                 name="busId"
                                 value={formData.busId}
