@@ -48,6 +48,7 @@ interface SocketLocationData {
   longitude: number;
   speed: number;
   status: string;
+  penumpang?: number;
   passenger_count?: number;
   daftar_eta?: any[];
 }
@@ -165,7 +166,7 @@ export default function Page() {
       const targetId = Number(data.id_bus || data.bus_id);
 
       if (!targetId) return;
-
+      const updatedPenumpang = data.penumpang ?? data.passenger_count;
       console.log("📍 Socket Masuk -> ID:", targetId, "Lat:", data.latitude, "Lng:", data.longitude);
 
       setBuses((currentBuses) => {
@@ -184,9 +185,7 @@ export default function Page() {
               longitude: parseFloat(String(data.longitude)),
               status: 'berjalan',
               terakhir_dilihat: new Date().toISOString(),
-              penumpang: (data.passenger_count !== undefined)
-                ? data.passenger_count
-                : bus.penumpang,
+              penumpang: updatedPenumpang !== undefined ? updatedPenumpang : bus.penumpang,
               daftar_eta: data.daftar_eta || bus.daftar_eta || []
             };
           }
@@ -202,9 +201,7 @@ export default function Page() {
             longitude: parseFloat(String(data.longitude)),
             status: 'berjalan',
             terakhir_dilihat: new Date().toISOString(),
-            penumpang: (data.passenger_count !== undefined)
-              ? data.passenger_count
-              : prev.penumpang,
+            penumpang: updatedPenumpang !== undefined ? updatedPenumpang : prev.penumpang,
             daftar_eta: data.daftar_eta || prev.daftar_eta || []
           };
         }
