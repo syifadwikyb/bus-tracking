@@ -30,13 +30,13 @@ export default function Header({ subtitle, title }: HeaderProps) {
                 </div>
 
                 <Link href="/profile">
-                    <div className="group flex h-14 w-14 items-center justify-center rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-inner cursor-pointer transition-all duration-300 hover:bg-white/20 hover:scale-105 hover:shadow-lg hover:shadow-blue-900/20">
+                    <div className="group flex justify-center items-center h-14 w-14 rounded-full bg-white cursor-pointer">
                         <Image
-                            src="/assets/icons/Profile.svg"
-                            alt="Admin Profile"
+                            src="/assets/images/logo-gradient.svg"
+                            alt="Logo"
                             width={45}
                             height={45}
-                            className="rounded-full object-cover p-0.5 group-hover:opacity-90 transition-opacity"
+                            className="rounded-full hover:scale-105 transition-all duration-300"
                         />
                     </div>
                 </Link>

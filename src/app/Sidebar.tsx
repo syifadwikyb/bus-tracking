@@ -63,24 +63,24 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     }, []);
 
     const handleLogout = async () => {
-            const result = await Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: 'Anda akan keluar dari aplikasi',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3B82F6',
-                confirmButtonText: 'Ya, keluar!',
-                cancelButtonText: 'Batal'
-            });
-    
-            if (result.isConfirmed) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-    
-                router.push('/auth/login');
-            }
-        };
+        const result = await Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: 'Anda akan keluar dari aplikasi',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3B82F6',
+            confirmButtonText: 'Ya, keluar!',
+            cancelButtonText: 'Batal'
+        });
+
+        if (result.isConfirmed) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+
+            router.push('/auth/login');
+        }
+    };
 
     return (
         <>
@@ -100,14 +100,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <div className="flex-1 overflow-y-auto no-scrollbar">
 
                     <div className="mb-6 flex items-center justify-between px-2 py-3">
-                        <div className="flex items-center space-x-2">
-                            <img
-                                src={"/assets/icons/Profile.svg"}
-                                alt="Logo DipTrack"
-                                className="h-14 w-14 shadow-lg"
-                            />
-                            <span className="text-2xl font-bold text-blue-600">DipTrack</span>
-                        </div>
+                        <img
+                            src={"/assets/images/logo-text-colored.svg"}
+                            alt="Logo DipTrack-colored"
+                            className="w-42 mx-auto"
+                        />
 
                         <button
                             onClick={onClose}

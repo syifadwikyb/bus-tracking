@@ -67,11 +67,10 @@ export default function LoginPage() {
                 <div className="relative z-10">
                     <div className="flex items-center space-x-3">
                         <img
-                            src={"/assets/icons/Profile.svg"}
-                            alt="Logo DipTrack"
-                            className="h-14 w-14 shadow-lg"
+                            src={"/assets/images/logo-text-white.svg"}
+                            alt="Logo DipTrack-White"
+                            className="w-44"
                         />
-                        <h1 className="text-2xl font-bold text-white tracking-wide">DipTrack</h1>
                     </div>
                 </div>
 
@@ -92,7 +91,11 @@ export default function LoginPage() {
             <div className="flex w-full lg:w-1/2 items-center justify-center p-8 bg-gray-50">
                 <div className="w-full max-w-md space-y-4 bg-white p-10 rounded-2xl shadow-xl border border-gray-100">
                     <div className="text-center lg:text-left">
-                        <h2 className="text-3xl text-center font-extrabold text-gray-900">DipTrack</h2>
+                        <img
+                            src={"/assets/images/logo-text-colored.svg"}
+                            alt="Logo DipTrack-text-colored"
+                            className="w-42 mx-auto"
+                        />
                         <p className="mt-2 text-gray-500">Selamat Datang Kembali</p>
                     </div>
 
